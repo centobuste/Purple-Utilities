@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Purple Utilities — Free Tools by Alessandro Viola</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f3ff;
+  --bg2: #ffffff;
+  --bg3: #ede9fe;
+  --card: #ffffff;
+  --text: #1e1b3a;
+  --text2: #4c4875;
+  --text3: #7c78a0;
+  --purple: #6d28d9;
+  --purple-light: #8b5cf6;
+  --purple-dark: #4c1d95;
+  --purple-glow: #ede9fe;
+  --accent: #a855f7;
+  --border: rgba(109,40,217,0.15);
+  --border2: rgba(109,40,217,0.3);
+  --shadow: 0 4px 32px rgba(109,40,217,0.10);
+  --shadow2: 0 8px 48px rgba(109,40,217,0.18);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --tag-bg: #ede9fe;
+  --tag-text: #4c1d95;
+  --input-bg: #f5f3ff;
+  --footer-bg: #2e1065;
+  --footer-text: #c4b5fd;
+}
+[data-theme="dark"] {
+  --bg: #0f0a1e;
+  --bg2: #1a1130;
+  --bg3: #12092a;
+  --card: #1e1535;
+  --text: #f0ebff;
+  --text2: #c4b5fd;
+  --text3: #7c70b8;
+  --purple: #a78bfa;
+  --purple-light: #c4b5fd;
+  --purple-dark: #7c3aed;
+  --purple-glow: #2e1065;
+  --accent: #e879f9;
+  --border: rgba(167,139,250,0.15);
+  --border2: rgba(167,139,250,0.35);
+  --shadow: 0 4px 32px rgba(0,0,0,0.4);
+  --shadow2: 0 8px 48px rgba(0,0,0,0.5);
+  --tag-bg: #2e1065;
+  --tag-text: #c4b5fd;
+  --input-bg: #1a1130;
+  --footer-bg: #06030f;
+  --footer-text: #7c70b8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+  overflow-x: hidden;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem;
+  height: 64px;
+  background: rgba(245,243,255,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s, border-color 0.3s;
+}
+[data-theme="dark"] nav {
+  background: rgba(15,10,30,0.85);
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 1.1rem;
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-logo-icon {
+  width: 32px; height: 32px;
+}
+.nav-actions { display: flex; align-items: center; gap: 12px; }
+.lang-btn, .theme-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.lang-btn:hover, .theme-btn:hover {
+  background: var(--purple-glow);
+  border-color: var(--border2);
+  color: var(--purple);
+}
+.theme-btn { font-size: 1rem; padding: 6px 10px; }
+
+/* HERO */
+.hero {
+  padding: 140px 2rem 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-bg-circle.c1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+  top: -100px; left: 50%; transform: translateX(-50%);
+}
+.hero-bg-circle.c2 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(232,121,249,0.08) 0%, transparent 70%);
+  top: 200px; right: 10%;
+}
+
+/* LOGO SVG */
+.logo-wrap {
+  display: flex; justify-content: center; margin-bottom: 2.5rem;
+  animation: fadeUp 0.8s ease both;
+}
+.logo-wrap svg { filter: drop-shadow(0 8px 24px rgba(109,40,217,0.25)); }
+[data-theme="dark"] .logo-wrap svg { filter: drop-shadow(0 8px 24px rgba(167,139,250,0.3)); }
+
+.hero-tag {
+  display: inline-block;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.9s 0.1s ease both;
+}
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 1.2rem;
+  animation: fadeUp 0.9s 0.15s ease both;
+}
+.hero h1 span { color: var(--purple); }
+.hero p {
+  max-width: 580px;
+  margin: 0 auto 2rem;
+  font-size: 1.1rem;
+  color: var(--text2);
+  font-weight: 300;
+  line-height: 1.7;
+  animation: fadeUp 0.9s 0.2s ease both;
+}
+.hero-badges {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+  animation: fadeUp 0.9s 0.25s ease both;
+}
+.badge {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 0.85rem;
+  color: var(--text2);
+  box-shadow: var(--shadow);
+}
+.badge-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple-light); }
+
+/* APPS GRID */
+.section {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 2rem 80px;
+}
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.section-sub {
+  color: var(--text3);
+  font-size: 0.95rem;
+  margin-bottom: 2.5rem;
+}
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+.app-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  position: relative; overflow: hidden;
+  animation: fadeUp 0.8s ease both;
+}
+.app-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--purple), var(--accent));
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.app-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow2);
+  border-color: var(--border2);
+}
+.app-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: var(--purple-glow);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+}
+.app-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.app-desc {
+  font-size: 0.92rem;
+  color: var(--text2);
+  line-height: 1.65;
+  flex: 1;
+}
+.app-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--purple-glow);
+  color: var(--purple);
+  border: 1px solid var(--border2);
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+  align-self: flex-start;
+}
+.app-link:hover {
+  background: var(--purple);
+  color: white;
+  border-color: var(--purple);
+}
+.app-link svg { width: 14px; height: 14px; }
+
+/* DIVIDER */
+.divider {
+  max-width: 1080px; margin: 0 auto 80px;
+  padding: 0 2rem;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+/* CONTACT */
+.contact-section {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 2rem 100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+@media (max-width: 700px) {
+  .contact-section { grid-template-columns: 1fr; gap: 2rem; }
+  nav { padding: 0 1rem; }
+  .hero { padding: 120px 1.2rem 60px; }
+}
+.contact-info { display: flex; flex-direction: column; gap: 1.5rem; }
+.contact-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 1rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.contact-card:hover {
+  border-color: var(--border2);
+  box-shadow: var(--shadow2);
+  transform: translateX(4px);
+}
+.contact-card-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--purple-glow);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.contact-card-text { display: flex; flex-direction: column; gap: 2px; }
+.contact-card-label { font-size: 0.75rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+.contact-card-value { font-size: 0.95rem; font-weight: 500; color: var(--text); }
+
+/* FORM */
+.contact-form { display: flex; flex-direction: column; gap: 1rem; }
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+}
+.form-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem; font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1.2rem;
+}
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+.form-group label {
+  font-size: 0.82rem; font-weight: 500;
+  color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em;
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--purple-light);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.12);
+}
+.form-group textarea { min-height: 110px; resize: vertical; line-height: 1.6; }
+.form-group select option { background: var(--bg2); color: var(--text); }
+.submit-btn {
+  background: var(--purple);
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 999px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+}
+.submit-btn:hover { background: var(--purple-dark); transform: translateY(-1px); }
+.submit-btn:active { transform: translateY(0); }
+
+/* FOOTER */
+footer {
+  background: var(--footer-bg);
+  color: var(--footer-text);
+  text-align: center;
+  padding: 2.5rem 2rem;
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+footer a { color: var(--purple-light); text-decoration: none; }
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* OPEN SOURCE BANNER */
+.oss-banner {
+  max-width: 1080px;
+  margin: 0 auto 80px;
+  padding: 0 2rem;
+}
+.oss-inner {
+  background: linear-gradient(135deg, var(--purple-glow) 0%, var(--bg3) 100%);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 2rem 2.5rem;
+  display: flex; align-items: center; gap: 2rem;
+  flex-wrap: wrap;
+}
+.oss-icon { font-size: 2.5rem; flex-shrink: 0; }
+.oss-text h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--text); margin-bottom: 0.4rem;
+}
+.oss-text p { font-size: 0.9rem; color: var(--text2); line-height: 1.6; }
+.oss-link {
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--purple);
+  color: white;
+  text-decoration: none;
+  padding: 11px 22px;
+  border-radius: 999px;
+  font-size: 0.9rem; font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.oss-link:hover { background: var(--purple-dark); }
+</style>
+</head>
+<body data-theme="light">
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <svg class="nav-logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="16" fill="#6d28d9"/>
+      <circle cx="16" cy="10" r="4" fill="#f0ebff"/>
+      <path d="M8 24c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#f0ebff" stroke-width="2" stroke-linecap="round"/>
+      <rect x="10" y="13" width="12" height="2" rx="1" fill="#c4b5fd" opacity="0.5"/>
+    </svg>
+    Purple Utilities
+  </a>
+  <div class="nav-actions">
+    <button class="lang-btn" onclick="toggleLang()" id="langBtn">🇬🇧 EN</button>
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-circle c1"></div>
+  <div class="hero-bg-circle c2"></div>
+
+  <!-- LOGO SVG -->
+  <div class="logo-wrap">
+    <svg width="340" height="200" viewBox="0 0 340 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- BG PILL -->
+      <rect x="10" y="10" width="320" height="180" rx="28" fill="#6d28d9" opacity="0.07"/>
+      <rect x="10" y="10" width="320" height="180" rx="28" stroke="#6d28d9" stroke-width="1.5" stroke-opacity="0.25"/>
+
+      <!-- CYBER GUY (pelato, occhiali da sole, hoodie) -->
+      <!-- Head (pelato) -->
+      <ellipse cx="100" cy="72" rx="28" ry="30" fill="#f4c18a"/>
+      <!-- Shaved head highlight -->
+      <ellipse cx="100" cy="60" rx="20" ry="14" fill="#e8a870" opacity="0.35"/>
+      <!-- Ears -->
+      <ellipse cx="72" cy="74" rx="5" ry="7" fill="#f4c18a"/>
+      <ellipse cx="128" cy="74" rx="5" ry="7" fill="#f4c18a"/>
+      <!-- Neck -->
+      <rect x="90" y="98" width="20" height="16" rx="4" fill="#f4c18a"/>
+      <!-- Hoodie body -->
+      <path d="M62 130 Q70 108 90 108 L90 114 Q80 116 78 130 Z" fill="#4c1d95"/>
+      <path d="M138 130 Q130 108 110 108 L110 114 Q120 116 122 130 Z" fill="#4c1d95"/>
+      <rect x="68" y="124" width="64" height="36" rx="6" fill="#5b21b6"/>
+      <!-- Hoodie details -->
+      <rect x="95" y="108" width="10" height="20" rx="3" fill="#4c1d95"/>
+      <path d="M85 120 Q100 128 115 120" stroke="#7c3aed" stroke-width="1.5" fill="none" stroke-opacity="0.6"/>
+      <!-- Sunglasses -->
+      <rect x="76" y="68" width="22" height="14" rx="5" fill="#1e1b3a"/>
+      <rect x="102" y="68" width="22" height="14" rx="5" fill="#1e1b3a"/>
+      <line x1="98" y1="74" x2="102" y2="74" stroke="#1e1b3a" stroke-width="2"/>
+      <line x1="72" y1="73" x2="68" y2="71" stroke="#1e1b3a" stroke-width="2" stroke-linecap="round"/>
+      <line x1="124" y1="73" x2="128" y2="71" stroke="#1e1b3a" stroke-width="2" stroke-linecap="round"/>
+      <!-- Lens glare -->
+      <rect x="78" y="70" width="6" height="3" rx="1.5" fill="white" opacity="0.25"/>
+      <rect x="104" y="70" width="6" height="3" rx="1.5" fill="white" opacity="0.25"/>
+      <!-- Subtle smile -->
+      <path d="M93 90 Q100 96 107 90" stroke="#c87941" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- Headset mic (cybersec look) -->
+      <path d="M72 70 Q60 64 62 52 Q64 44 72 44" stroke="#7c3aed" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="62" cy="76" r="4" fill="#7c3aed"/>
+      <line x1="58" y1="76" x2="46" y2="80" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="45" cy="80" r="3" fill="#a855f7"/>
+
+      <!-- FLOWER VIOLA (in basso a sinistra del personaggio) -->
+      <!-- Stem -->
+      <path d="M52 170 Q56 155 60 140" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <!-- Leaf -->
+      <path d="M56 155 Q44 148 46 140 Q54 144 56 155" fill="#22c55e" opacity="0.8"/>
+      <!-- Petals -->
+      <ellipse cx="60" cy="132" rx="7" ry="12" fill="#9333ea" transform="rotate(-20 60 132)"/>
+      <ellipse cx="60" cy="132" rx="7" ry="12" fill="#a855f7" transform="rotate(40 60 132)"/>
+      <ellipse cx="60" cy="132" rx="7" ry="12" fill="#7c3aed" transform="rotate(100 60 132)"/>
+      <ellipse cx="60" cy="132" rx="7" ry="12" fill="#c084fc" transform="rotate(160 60 132)"/>
+      <ellipse cx="60" cy="132" rx="7" ry="12" fill="#9333ea" transform="rotate(220 60 132)"/>
+      <!-- Flower center -->
+      <circle cx="60" cy="132" r="7" fill="#fef08a"/>
+      <circle cx="60" cy="132" r="4" fill="#fbbf24"/>
+
+      <!-- STRUMENTO MUSICALE VIOLA: Violino stilizzato -->
+      <!-- Body -->
+      <path d="M148 155 Q140 148 142 138 Q144 128 152 124 Q160 120 166 126 Q172 132 170 142 Q168 152 160 158 Q154 162 148 155 Z" fill="#7c3aed"/>
+      <!-- Body shading -->
+      <path d="M150 153 Q143 147 145 138 Q147 130 154 127" stroke="#c4b5fd" stroke-width="1" fill="none" opacity="0.5"/>
+      <!-- Waist cutout left -->
+      <path d="M144 142 Q140 140 141 136 Q142 133 145 133" stroke="#5b21b6" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- Waist cutout right -->
+      <path d="M168 138 Q172 136 171 132 Q170 129 167 129" stroke="#5b21b6" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- Neck -->
+      <rect x="154" y="108" width="6" height="20" rx="3" fill="#6d28d9"/>
+      <!-- Scroll (riccio) -->
+      <path d="M157 108 Q162 102 164 96 Q163 91 159 92 Q156 94 157 99" stroke="#8b5cf6" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- Strings -->
+      <line x1="153" y1="126" x2="151" y2="156" stroke="#e2e8f0" stroke-width="0.8" opacity="0.7"/>
+      <line x1="156" y1="124" x2="154" y2="157" stroke="#e2e8f0" stroke-width="0.8" opacity="0.7"/>
+      <line x1="159" y1="123" x2="157" y2="157" stroke="#e2e8f0" stroke-width="0.8" opacity="0.7"/>
+      <line x1="162" y1="124" x2="160" y2="156" stroke="#e2e8f0" stroke-width="0.8" opacity="0.7"/>
+      <!-- Bridge -->
+      <path d="M150 143 L165 140" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- F-holes -->
+      <path d="M149 137 Q147 140 149 143" stroke="#4c1d95" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <path d="M164 134 Q162 137 164 140" stroke="#4c1d95" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <!-- Bow -->
+      <path d="M172 118 Q183 130 178 150" stroke="#fbbf24" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M174 119 Q185 131 180 151" stroke="#fef08a" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.6"/>
+
+      <!-- LOGO TEXT -->
+      <text x="196" y="105" font-family="'Syne', sans-serif" font-size="28" font-weight="800" fill="#6d28d9">Purple</text>
+      <text x="196" y="138" font-family="'Syne', sans-serif" font-size="28" font-weight="800" fill="#1e1b3a">Utilities</text>
+      <!-- Tagline -->
+      <text x="196" y="160" font-family="'DM Sans', sans-serif" font-size="12" font-weight="300" fill="#7c78a0">Free tools. Open source. No strings.</text>
+      <!-- Stars deco -->
+      <text x="196" y="182" font-family="monospace" font-size="13" fill="#a855f7" opacity="0.7">★ ★ ★</text>
+    </svg>
+  </div>
+
+  <div class="hero-tag" id="heroTag">🆓 100% Gratuito · Open Source · Modificabile liberamente</div>
+
+  <h1 id="heroTitle">Strumenti <span>viola</span> per<br>la tua vita digitale</h1>
+
+  <p id="heroDesc">Una collezione di utility web gratuite, realizzate con passione e condivise liberamente. Usale, modificale, migliorale — nessun vincolo, nessuna licenza restrittiva.</p>
+
+  <div class="hero-badges">
+    <div class="badge"><div class="badge-dot"></div><span id="b1">Gratuito per sempre</span></div>
+    <div class="badge"><div class="badge-dot"></div><span id="b2">Nessuna registrazione</span></div>
+    <div class="badge"><div class="badge-dot"></div><span id="b3">Codice sorgente aperto</span></div>
+  </div>
+</section>
+
+<!-- APPS -->
+<section class="section">
+  <h2 class="section-title" id="appsTitle">Le Applicazioni</h2>
+  <p class="section-sub" id="appsSub">Clicca su un'app per aprirla direttamente nel browser.</p>
+
+  <div class="apps-grid">
+    <!-- APP 1 -->
+    <div class="app-card" style="animation-delay:0.05s">
+      <div class="app-icon">⚡</div>
+      <div>
+        <div class="app-name">Ricarica Speedy</div>
+      </div>
+      <p class="app-desc" id="desc1">Calcola in modo preciso i tempi di ricarica del tuo scooter elettrico con potenza massima di 3.3 kWh. Inserisci la percentuale attuale, quella desiderata e il tipo di caricatore — il risultato è immediato.</p>
+      <a class="app-link" href="https://centobuste.github.io/ricarica-speedy" target="_blank">
+        Avvia l'app
+        <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <!-- APP 2 -->
+    <div class="app-card" style="animation-delay:0.1s">
+      <div class="app-icon">📅</div>
+      <div>
+        <div class="app-name">Starion Smart Working Planner</div>
+      </div>
+      <p class="app-desc" id="desc2">Tieni traccia intelligente delle giornate in presenza secondo la policy Starion: almeno il 30% delle presenze mensili obbligatorie. Pianifica, monitora e rispetta i tuoi obblighi senza stress.</p>
+      <a class="app-link" href="https://centobuste.github.io/starion-planner" target="_blank">
+        Avvia l'app
+        <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <!-- APP 3 -->
+    <div class="app-card" style="animation-delay:0.15s">
+      <div class="app-icon">🍅</div>
+      <div>
+        <div class="app-name">FocusFlow</div>
+      </div>
+      <p class="app-desc" id="desc3">Rimani concentrato sui tuoi task con sessioni di lavoro strutturate e pause programmate, ispirate alla tecnica Pomodoro. Personalizza i timer, traccia la produttività e combatti la procrastinazione.</p>
+      <a class="app-link" href="https://centobuste.github.io/focusflow" target="_blank">
+        Avvia l'app
+        <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- OSS BANNER -->
+<div class="oss-banner">
+  <div class="oss-inner">
+    <div class="oss-icon">🐙</div>
+    <div class="oss-text">
+      <h3 id="ossTitle">Tutto il codice è su GitHub</h3>
+      <p id="ossDesc">Fork, star, pull request — sei il benvenuto. Le utility sono pubbliche e liberamente modificabili. Nessuna restrizione d'uso.</p>
+    </div>
+    <a class="oss-link" href="https://github.com/centobuste" target="_blank" id="ossBtn">
+      Vai al repository →
+    </a>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- CONTACT -->
+<div class="contact-section">
+  <div>
+    <h2 class="section-title" id="contactTitle">Contatti & Feedback</h2>
+    <p class="section-sub" id="contactSub">Hai un'idea per una nuova utility? Un bug da segnalare? Scrivimi!</p>
+
+    <div class="contact-info" style="margin-top: 1.5rem;">
+      <a class="contact-card" href="mailto:alessandro.viola@outlook.com">
+        <div class="contact-card-icon">✉️</div>
+        <div class="contact-card-text">
+          <span class="contact-card-label" id="ccLabel1">Email</span>
+          <span class="contact-card-value">alessandro.viola@outlook.com</span>
+        </div>
+      </a>
+      <a class="contact-card" href="https://www.linkedin.com/in/alessandro-viola-167b0690" target="_blank">
+        <div class="contact-card-icon">💼</div>
+        <div class="contact-card-text">
+          <span class="contact-card-label" id="ccLabel2">LinkedIn</span>
+          <span class="contact-card-value">Alessandro Viola</span>
+        </div>
+      </a>
+      <a class="contact-card" href="https://github.com/centobuste" target="_blank">
+        <div class="contact-card-icon">🐙</div>
+        <div class="contact-card-text">
+          <span class="contact-card-label">GitHub</span>
+          <span class="contact-card-value">@centobuste</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="contact-form">
+    <div class="form-card">
+      <div class="form-title" id="formTitle">💬 Inviami un messaggio</div>
+      <div class="form-group">
+        <label id="fl1">Il tuo nome</label>
+        <input type="text" id="fi-name" placeholder="Mario Rossi">
+      </div>
+      <div class="form-group">
+        <label id="fl2">La tua email</label>
+        <input type="email" id="fi-email" placeholder="mario@esempio.it">
+      </div>
+      <div class="form-group">
+        <label id="fl3">Argomento</label>
+        <select id="fi-topic">
+          <option id="fo1">💡 Idea per una nuova utility</option>
+          <option id="fo2">🐛 Segnalazione bug</option>
+          <option id="fo3">✨ Richiesta funzionalità</option>
+          <option id="fo4">💬 Feedback generale</option>
+          <option id="fo5">🤝 Collaborazione</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label id="fl4">Messaggio</label>
+        <textarea id="fi-msg" placeholder="Descrivi la tua idea, il bug o il tuo commento..."></textarea>
+      </div>
+      <button class="submit-btn" onclick="sendEmail()">
+        <span>✉</span>
+        <span id="submitTxt">Invia messaggio</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p id="footerText">Fatto con 💜 da <a href="https://github.com/centobuste" target="_blank">Alessandro Viola</a> · Purple Utilities è open source e totalmente gratuito</p>
+  <p style="margin-top: 0.5rem; opacity: 0.6; font-size: 0.8rem;" id="footerSub">Prendilo, modificalo, miglioralo — è tuo.</p>
+</footer>
+
+<script>
+const IT = {
+  heroTag: '🆓 100% Gratuito · Open Source · Modificabile liberamente',
+  heroTitle: 'Strumenti <span>viola</span> per<br>la tua vita digitale',
+  heroDesc: 'Una collezione di utility web gratuite, realizzate con passione e condivise liberamente. Usale, modificale, migliorale — nessun vincolo, nessuna licenza restrittiva.',
+  b1: 'Gratuito per sempre', b2: 'Nessuna registrazione', b3: 'Codice sorgente aperto',
+  appsTitle: 'Le Applicazioni', appsSub: 'Clicca su un\'app per aprirla direttamente nel browser.',
+  desc1: 'Calcola in modo preciso i tempi di ricarica del tuo scooter elettrico con potenza massima di 3.3 kWh. Inserisci la percentuale attuale, quella desiderata e il tipo di caricatore — il risultato è immediato.',
+  desc2: 'Tieni traccia intelligente delle giornate in presenza secondo la policy Starion: almeno il 30% delle presenze mensili obbligatorie. Pianifica, monitora e rispetta i tuoi obblighi senza stress.',
+  desc3: 'Rimani concentrato sui tuoi task con sessioni di lavoro strutturate e pause programmate, ispirate alla tecnica Pomodoro. Personalizza i timer, traccia la produttività e combatti la procrastinazione.',
+  ossTitle: 'Tutto il codice è su GitHub', ossDesc: 'Fork, star, pull request — sei il benvenuto. Le utility sono pubbliche e liberamente modificabili. Nessuna restrizione d\'uso.', ossBtn: 'Vai al repository →',
+  contactTitle: 'Contatti & Feedback', contactSub: 'Hai un\'idea per una nuova utility? Un bug da segnalare? Scrivimi!',
+  ccLabel1: 'Email', ccLabel2: 'LinkedIn',
+  formTitle: '💬 Inviami un messaggio',
+  fl1: 'Il tuo nome', fl2: 'La tua email', fl3: 'Argomento', fl4: 'Messaggio',
+  fo1: '💡 Idea per una nuova utility', fo2: '🐛 Segnalazione bug', fo3: '✨ Richiesta funzionalità', fo4: '💬 Feedback generale', fo5: '🤝 Collaborazione',
+  fi_name: 'Mario Rossi', fi_email: 'mario@esempio.it', fi_msg: 'Descrivi la tua idea, il bug o il tuo commento...',
+  submitTxt: 'Invia messaggio',
+  appLink: 'Avvia l\'app',
+  footerText: 'Fatto con 💜 da <a href="https://github.com/centobuste" target="_blank">Alessandro Viola</a> · Purple Utilities è open source e totalmente gratuito',
+  footerSub: 'Prendilo, modificalo, miglioralo — è tuo.',
+  langBtn: '🇬🇧 EN',
+  htmlLang: 'it',
+};
+const EN = {
+  heroTag: '🆓 100% Free · Open Source · Freely Modifiable',
+  heroTitle: 'Purple <span>tools</span> for<br>your digital life',
+  heroDesc: 'A collection of free web utilities, built with passion and shared freely. Use them, modify them, improve them — no restrictions, no restrictive licenses.',
+  b1: 'Free forever', b2: 'No sign-up required', b3: 'Open source code',
+  appsTitle: 'The Applications', appsSub: 'Click an app to open it directly in your browser.',
+  desc1: 'Accurately calculate the charging time for your electric scooter with a maximum power of 3.3 kWh. Enter the current percentage, the target, and the charger type — instant results.',
+  desc2: 'Smartly track your on-site working days according to the Starion policy: at least 30% mandatory monthly presence. Plan, monitor, and stay compliant without stress.',
+  desc3: 'Stay focused on your tasks with structured work sessions and scheduled breaks, inspired by the Pomodoro technique. Customize timers, track productivity, and beat procrastination.',
+  ossTitle: 'All the code is on GitHub', ossDesc: 'Fork, star, pull request — you are welcome. The utilities are public and freely modifiable. No usage restrictions.', ossBtn: 'Go to repository →',
+  contactTitle: 'Contact & Feedback', contactSub: 'Have an idea for a new utility? A bug to report? Write to me!',
+  ccLabel1: 'Email', ccLabel2: 'LinkedIn',
+  formTitle: '💬 Send me a message',
+  fl1: 'Your name', fl2: 'Your email', fl3: 'Topic', fl4: 'Message',
+  fo1: '💡 Idea for a new utility', fo2: '🐛 Bug report', fo3: '✨ Feature request', fo4: '💬 General feedback', fo5: '🤝 Collaboration',
+  fi_name: 'John Smith', fi_email: 'john@example.com', fi_msg: 'Describe your idea, the bug or your comment...',
+  submitTxt: 'Send message',
+  appLink: 'Launch app',
+  footerText: 'Made with 💜 by <a href="https://github.com/centobuste" target="_blank">Alessandro Viola</a> · Purple Utilities is open source and totally free',
+  footerSub: 'Take it, modify it, improve it — it\'s yours.',
+  langBtn: '🇮🇹 IT',
+  htmlLang: 'en',
+};
+
+let lang = 'IT';
+
+function applyLang(l) {
+  const d = l === 'IT' ? IT : EN;
+  const ids = ['heroTag','heroTitle','heroDesc','b1','b2','b3','appsTitle','appsSub',
+    'desc1','desc2','desc3','ossTitle','ossDesc','ossBtn','contactTitle','contactSub',
+    'ccLabel1','ccLabel2','formTitle','fl1','fl2','fl3','fl4','fo1','fo2','fo3','fo4','fo5',
+    'submitTxt','footerText','footerSub','langBtn'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (['heroTitle','footerText'].includes(id)) el.innerHTML = d[id];
+    else el.textContent = d[id];
+  });
+  document.getElementById('fi-name').placeholder = d.fi_name;
+  document.getElementById('fi-email').placeholder = d.fi_email;
+  document.getElementById('fi-msg').placeholder = d.fi_msg;
+  document.querySelectorAll('.app-link').forEach(a => {
+    a.childNodes[0].textContent = d.appLink + ' ';
+  });
+  document.documentElement.lang = d.htmlLang;
+}
+
+function toggleLang() {
+  lang = lang === 'IT' ? 'EN' : 'IT';
+  applyLang(lang);
+}
+
+let dark = false;
+function toggleTheme() {
+  dark = !dark;
+  document.body.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.getElementById('themeBtn').textContent = dark ? '☀️' : '🌙';
+}
+
+function sendEmail() {
+  const name = document.getElementById('fi-name').value.trim();
+  const email = document.getElementById('fi-email').value.trim();
+  const topic = document.getElementById('fi-topic').value;
+  const msg = document.getElementById('fi-msg').value.trim();
+  if (!name || !msg) {
+    alert(lang === 'IT' ? 'Inserisci almeno il nome e il messaggio.' : 'Please enter at least your name and message.');
+    return;
+  }
+  const sub = encodeURIComponent('[Purple Utilities] ' + topic);
+  const body = encodeURIComponent('Nome: ' + name + '\nEmail: ' + email + '\n\n' + msg);
+  window.location.href = 'mailto:alessandro.viola@outlook.com?subject=' + sub + '&body=' + body;
+}
+</script>
+</body>
+</html>

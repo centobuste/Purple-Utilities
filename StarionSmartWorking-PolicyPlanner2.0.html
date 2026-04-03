@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presenze Ufficio — Frascati</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0e1117; --surface:#161b27; --surface2:#1e2535; --border:#2a3347;
+  --accent:#2dd4bf; --accent2:#f59e0b; --accent3:#f43f5e;
+  --text:#e8eaf0; --text-muted:#6b7a99; --text-dim:#3d4d6b;
+  --green:#10b981; --red:#f43f5e; --sw:#818cf8;
+  --weekend:#1a2035; --holiday:#1e1530; --selected:#0f2d2a;
+  --ferie-bg:#1a1f10; --malattia-bg:#1f1015; --sw-bg:#101828;
+  --radius:12px; --radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-weight:400;min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+header{position:relative;padding:2.5rem 2rem 1.8rem;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--surface) 0%,#0e1520 100%);overflow:hidden}
+header::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(45,212,191,.08) 0%,transparent 70%);pointer-events:none}
+.header-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.logo-area h1{font-family:'DM Serif Display',serif;font-size:clamp(1.4rem,3vw,2.2rem);letter-spacing:-.02em;line-height:1.1}
+.logo-area h1 span{color:var(--accent)}
+.logo-area p{margin-top:.35rem;color:var(--text-muted);font-size:.82rem;letter-spacing:.04em;text-transform:uppercase}
+.header-controls{display:flex;gap:.8rem;align-items:flex-end;flex-wrap:wrap}
+.ctrl-group{display:flex;flex-direction:column;gap:.25rem}
+.ctrl-group label{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);font-family:'DM Mono',monospace}
+select{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.5rem 2rem .5rem .8rem;font-family:'Outfit',sans-serif;font-size:.88rem;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7a99' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .7rem center;transition:border-color .2s}
+select:focus{outline:none;border-color:var(--accent)}
+
+/* LANG TOGGLE */
+.lang-toggle{display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--surface2)}
+.lang-btn{padding:.45rem .7rem;background:none;border:none;color:var(--text-muted);font-family:'DM Mono',monospace;font-size:.75rem;cursor:pointer;transition:background .15s,color .15s;display:flex;align-items:center;gap:.3rem}
+.lang-btn.active{background:rgba(45,212,191,.12);color:var(--accent)}
+.lang-btn:hover:not(.active){background:var(--border);color:var(--text)}
+.lang-sep{width:1px;background:var(--border);align-self:stretch}
+
+/* MAIN */
+main{max-width:1280px;margin:0 auto;padding:2rem;display:grid;grid-template-columns:1fr 340px;gap:1.5rem}
+@media(max-width:1024px){main{grid-template-columns:1fr}}
+.left-col{display:flex;flex-direction:column;gap:1.5rem}
+.sidebar{display:flex;flex-direction:column;gap:1.5rem}
+
+/* PANEL */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.panel-header{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.7rem}
+.panel-header h2{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);font-family:'DM Mono',monospace;font-weight:500}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1px;background:var(--border)}
+.kpi-card{background:var(--surface);padding:1.1rem 1.1rem .9rem;display:flex;flex-direction:column;gap:.25rem}
+.kpi-card.warn{background:linear-gradient(135deg,#1f1015,#0e1117)}
+.kpi-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-family:'DM Mono',monospace;line-height:1.3}
+.kpi-value{font-family:'DM Serif Display',serif;font-size:1.9rem;line-height:1;color:var(--text)}
+.kpi-value.teal{color:var(--accent)} .kpi-value.amber{color:var(--accent2)} .kpi-value.red{color:var(--accent3)} .kpi-value.sw{color:var(--sw)}
+.kpi-sub{font-size:.67rem;color:var(--text-dim);font-family:'DM Mono',monospace}
+
+/* STATUS */
+.status-bar{padding:1.3rem 1.4rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.status-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.status-ok .status-icon{background:rgba(16,185,129,.2);color:var(--green)}
+.status-ko .status-icon{background:rgba(244,63,94,.2);color:var(--red)}
+.status-warn .status-icon{background:rgba(245,158,11,.2);color:var(--accent2)}
+.status-label{font-size:.92rem;font-weight:600}
+.status-ok .status-label{color:var(--green)} .status-ko .status-label{color:var(--red)} .status-warn .status-label{color:var(--accent2)}
+.progress-wrap{flex:1;min-width:180px}
+.progress-track{height:7px;background:var(--surface2);border-radius:4px;overflow:hidden;position:relative}
+.progress-fill{height:100%;border-radius:4px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.progress-fill.ok{background:linear-gradient(90deg,var(--green),var(--accent))}
+.progress-fill.ko{background:linear-gradient(90deg,var(--accent3),#f59e0b)}
+.progress-fill.warn-f{background:linear-gradient(90deg,var(--accent2),#f59e0b88)}
+.progress-info{display:flex;justify-content:space-between;margin-top:.35rem;font-size:.67rem;color:var(--text-muted);font-family:'DM Mono',monospace}
+
+/* CALENDAR */
+.calendar-wrap{padding:1rem 1.4rem 1.4rem}
+.cal-weekdays{display:grid;grid-template-columns:26px repeat(7,1fr);gap:3px;margin-bottom:3px}
+.cal-wd-spacer{width:26px}
+.cal-weekday{text-align:center;font-size:.62rem;font-family:'DM Mono',monospace;color:var(--text-dim);text-transform:uppercase;padding:.25rem 0;letter-spacing:.05em}
+.cal-grid{display:grid;grid-template-columns:26px repeat(7,1fr);gap:3px}
+.week-row-label{grid-column:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.week-num-badge{font-size:.54rem;padding:.1rem .22rem;border-radius:3px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-family:'DM Mono',monospace;line-height:1.2;text-align:center}
+.week-num-badge.warn-w{background:rgba(244,63,94,.1);border-color:rgba(244,63,94,.2);color:var(--accent3)}
+.week-num-badge.short-w{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.25);color:var(--accent2)}
+.week-warn-dot{width:4px;height:4px;border-radius:50%;background:var(--accent3);flex-shrink:0}
+.week-short-dot{width:4px;height:4px;border-radius:50%;background:var(--accent2);flex-shrink:0}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--radius-sm);font-size:.83rem;font-weight:500;position:relative;cursor:default;transition:background .15s,transform .1s;border:1px solid transparent;min-height:40px;gap:2px}
+.cal-day .day-num{line-height:1}
+.cal-day .day-dot{width:4px;height:4px;border-radius:50%;position:absolute;bottom:4px}
+.cal-day.empty{background:transparent;border-color:transparent}
+.cal-day.weekend{background:var(--weekend);color:var(--text-dim)}
+.cal-day.holiday{background:var(--holiday);border-color:rgba(245,158,11,.2);color:var(--accent2)}
+.cal-day.holiday.weekend{background:#170f1e;color:#7c6030;border-color:rgba(245,158,11,.1)}
+.cal-day.workday{background:var(--surface2);color:var(--text);cursor:pointer}
+.cal-day.workday:hover{background:#232d42;transform:translateY(-1px);border-color:var(--border)}
+.cal-day.s-presenza{background:var(--selected);border-color:rgba(45,212,191,.4);color:var(--accent)}
+.cal-day.s-presenza .day-dot{background:var(--accent)}
+.cal-day.s-smartworking{background:var(--sw-bg);border-color:rgba(129,140,248,.35);color:var(--sw)}
+.cal-day.s-smartworking .day-dot{background:var(--sw)}
+.cal-day.s-ferie{background:var(--ferie-bg);border-color:rgba(245,158,11,.3);color:var(--accent2)}
+.cal-day.s-ferie .day-dot{background:var(--accent2)}
+.cal-day.s-malattia{background:var(--malattia-bg);border-color:rgba(244,63,94,.3);color:var(--accent3)}
+.cal-day.s-malattia .day-dot{background:var(--accent3)}
+.cal-day.day-icon-s{font-size:.52rem;line-height:1;opacity:.85}
+.week-warn-outline{outline:1px solid rgba(244,63,94,.22);outline-offset:-1px}
+
+/* LEGEND */
+.legend{padding:.7rem 1.4rem;border-top:1px solid var(--border);display:flex;gap:.85rem;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:.35rem;font-size:.65rem;color:var(--text-muted);font-family:'DM Mono',monospace}
+.legend-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* TOOLTIP HINT */
+.tooltip-hint{padding:.55rem 1.4rem;border-top:1px solid var(--border);font-size:.63rem;color:var(--text-dim);font-family:'DM Mono',monospace;line-height:1.5}
+
+/* HOLIDAYS */
+.holidays-list{padding:.9rem 1.4rem;display:flex;flex-direction:column;gap:.55rem}
+.holiday-item{display:flex;flex-direction:column;gap:.2rem;padding:.8rem .95rem;background:var(--surface2);border-radius:var(--radius-sm);border-left:3px solid var(--accent2)}
+.holiday-item.hol-we{border-left-color:var(--text-dim);opacity:.7}
+.holiday-name{font-size:.8rem;font-weight:500;color:var(--text)}
+.holiday-date{font-size:.68rem;color:var(--text-muted);font-family:'DM Mono',monospace}
+.holiday-badges{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.15rem}
+.badge{font-size:.58rem;font-family:'DM Mono',monospace;padding:.12rem .45rem;border-radius:20px;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.badge-f{background:rgba(244,63,94,.15);color:var(--accent3);border:1px solid rgba(244,63,94,.2)}
+.badge-s{background:rgba(107,122,153,.15);color:var(--text-muted);border:1px solid rgba(107,122,153,.2)}
+.badge-nc{background:rgba(45,212,191,.1);color:var(--accent);border:1px solid rgba(45,212,191,.15)}
+.badge-loc{background:rgba(245,158,11,.1);color:var(--accent2);border:1px solid rgba(245,158,11,.15)}
+.empty-state{text-align:center;padding:1.8rem 1rem;color:var(--text-dim);font-size:.8rem;font-family:'DM Mono',monospace}
+.empty-state .ei{font-size:1.6rem;margin-bottom:.4rem}
+
+/* ASSENZE */
+.assenze-form{padding:1.1rem 1.4rem;display:flex;flex-direction:column;gap:.9rem}
+.input-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.input-label{display:flex;flex-direction:column;gap:.15rem}
+.input-label .il-main{font-size:.8rem;font-weight:500;color:var(--text)}
+.input-label .il-sub{font-size:.63rem;color:var(--text-muted);font-family:'DM Mono',monospace}
+.num-wrap{display:flex;align-items:center;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--surface2)}
+.num-btn{width:30px;height:34px;background:none;border:none;color:var(--text-muted);font-size:1rem;cursor:pointer;transition:background .15s,color .15s;display:flex;align-items:center;justify-content:center}
+.num-btn:hover{background:var(--border);color:var(--text)}
+.num-display{width:44px;text-align:center;font-family:'DM Mono',monospace;font-size:.9rem;color:var(--text);border-left:1px solid var(--border);border-right:1px solid var(--border);line-height:34px;font-weight:500}
+.reset-btn{width:100%;padding:.55rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-muted);font-family:'Outfit',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s}
+.reset-btn:hover{background:var(--border);color:var(--text)}
+
+/* EXPORT */
+.export-section{padding:1.1rem 1.4rem;display:flex;flex-direction:column;gap:.8rem}
+.scope-btns{display:flex;gap:.5rem}
+.scope-btn{flex:1;padding:.42rem .5rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-muted);font-family:'DM Mono',monospace;font-size:.63rem;cursor:pointer;text-align:center;transition:all .15s;text-transform:uppercase;letter-spacing:.05em}
+.scope-btn.active{background:rgba(45,212,191,.1);border-color:rgba(45,212,191,.3);color:var(--accent)}
+.export-options{display:flex;flex-direction:column;gap:.45rem}
+.export-option{display:flex;align-items:center;gap:.7rem;padding:.65rem .8rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:border-color .2s,background .2s;user-select:none}
+.export-option:hover{border-color:var(--accent);background:#1a2535}
+.export-option.checked .export-check{background:var(--accent);border-color:var(--accent);color:#0e1117}
+.export-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.export-option-text{display:flex;flex-direction:column;gap:.08rem;flex:1}
+.export-option-text .eo-main{font-size:.78rem;font-weight:500;color:var(--text)}
+.export-option-text .eo-sub{font-size:.62rem;color:var(--text-muted);font-family:'DM Mono',monospace}
+.export-check{width:15px;height:15px;border:1.5px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;font-size:.62rem;color:transparent}
+.export-btn{width:100%;padding:.7rem 1rem;background:linear-gradient(135deg,rgba(45,212,191,.15),rgba(45,212,191,.05));border:1px solid rgba(45,212,191,.3);border-radius:var(--radius-sm);color:var(--accent);font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.export-btn:hover{background:linear-gradient(135deg,rgba(45,212,191,.25),rgba(45,212,191,.1));border-color:rgba(45,212,191,.5);transform:translateY(-1px);box-shadow:0 4px 16px rgba(45,212,191,.1)}
+.export-note{font-size:.61rem;color:var(--text-dim);font-family:'DM Mono',monospace;line-height:1.5;text-align:center}
+
+/* CONTEXT MENU */
+.ctx-menu{position:fixed;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:1000;min-width:150px;overflow:hidden;display:none}
+.ctx-menu.show{display:block}
+.ctx-item{padding:.65rem 1rem;font-size:.8rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;transition:background .15s;color:var(--text)}
+.ctx-item:hover{background:var(--border)}
+.ctx-item.ci-presence{color:var(--accent)} .ctx-item.ci-sw{color:var(--sw)} .ctx-item.ci-vacation{color:var(--accent2)} .ctx-item.ci-sick{color:var(--accent3)} .ctx-item.ci-none{color:var(--text-muted)}
+.ctx-sep{height:1px;background:var(--border)}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:.7rem 1.4rem;font-size:.8rem;color:var(--accent);font-family:'DM Mono',monospace;box-shadow:0 8px 32px rgba(0,0,0,.4);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);z-index:2000;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-area">
+      <h1 id="appTitle">Presenze <span>Ufficio</span></h1>
+      <p id="appSubtitle">Calcolo presenza minima · Frascati · 30% giorni lavorativi</p>
+    </div>
+    <div class="header-controls">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btnIT" onclick="setLang('it')">🇮🇹 IT</button>
+        <div class="lang-sep"></div>
+        <button class="lang-btn" id="btnEN" onclick="setLang('en')">🇬🇧 EN</button>
+      </div>
+      <div class="ctrl-group">
+        <label id="lbAnno">Anno</label>
+        <select id="selAnno"></select>
+      </div>
+      <div class="ctrl-group">
+        <label id="lbMese">Mese</label>
+        <select id="selMese"></select>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="left-col">
+    <!-- KPI -->
+    <div class="panel">
+      <div class="panel-header"><div class="dot"></div><h2 id="h2Summary">Riepilogo Mese</h2></div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+      <div style="border-top:1px solid var(--border)"><div class="status-bar" id="statusBar"></div></div>
+    </div>
+    <!-- CALENDAR -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="dot" style="background:var(--accent2)"></div>
+        <h2 id="h2Cal">Calendario Interattivo</h2>
+        <span id="calHint" style="margin-left:auto;font-size:.67rem;color:var(--text-dim);font-family:'DM Mono',monospace">click destro per lo stato</span>
+      </div>
+      <div class="calendar-wrap">
+        <div class="cal-weekdays">
+          <div class="cal-wd-spacer"></div>
+          <div class="cal-weekday" id="wdMon">Lun</div>
+          <div class="cal-weekday" id="wdTue">Mar</div>
+          <div class="cal-weekday" id="wdWed">Mer</div>
+          <div class="cal-weekday" id="wdThu">Gio</div>
+          <div class="cal-weekday" id="wdFri">Ven</div>
+          <div class="cal-weekday" id="wdSat">Sab</div>
+          <div class="cal-weekday" id="wdSun">Dom</div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--surface2);border:1px solid var(--border)"></div><span id="lgWork">Lavorativo</span></div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--selected);border:1px solid rgba(45,212,191,.4)"></div><span id="lgPresence">Presenza</span></div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--sw-bg);border:1px solid rgba(129,140,248,.35)"></div><span id="lgSW">Smart working</span></div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--ferie-bg);border:1px solid rgba(245,158,11,.3)"></div><span id="lgVac">Ferie</span></div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--malattia-bg);border:1px solid rgba(244,63,94,.3)"></div><span id="lgSick">Malattia</span></div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--holiday)"></div><span id="lgHol">Festività</span></div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--weekend)"></div><span id="lgWknd">Weekend</span></div>
+      </div>
+      <div class="tooltip-hint" id="tooltipHint">Clicca per ciclare: <strong style="color:var(--accent)">Presenza</strong> → <strong style="color:var(--sw)">Smart working</strong> → <strong style="color:var(--accent2)">Ferie</strong> → <strong style="color:var(--accent3)">Malattia</strong> → nessuno.</div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <!-- HOLIDAYS -->
+    <div class="panel">
+      <div class="panel-header"><div class="dot" style="background:var(--accent2)"></div><h2 id="h2Hol">Festività del Mese</h2></div>
+      <div class="holidays-list" id="holidaysList"></div>
+    </div>
+    <!-- ABSENCES -->
+    <div class="panel">
+      <div class="panel-header"><div class="dot" style="background:var(--accent3)"></div><h2 id="h2Abs">Assenze</h2></div>
+      <div class="assenze-form">
+        <div>
+          <div class="input-row">
+            <div class="input-label"><span class="il-main" id="lbSick">Malattia</span><span class="il-sub" id="lbDays">Giorni nel mese</span></div>
+            <div class="num-wrap">
+              <button class="num-btn" onclick="adjustNum('malattia',-1)">−</button>
+              <div class="num-display" id="malDisplay">0</div>
+              <button class="num-btn" onclick="adjustNum('malattia',1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="input-row">
+            <div class="input-label"><span class="il-main" id="lbVac">Ferie</span><span class="il-sub" id="lbDays2">Giorni nel mese</span></div>
+            <div class="num-wrap">
+              <button class="num-btn" onclick="adjustNum('ferie',-1)">−</button>
+              <div class="num-display" id="ferDisplay">0</div>
+              <button class="num-btn" onclick="adjustNum('ferie',1)">+</button>
+            </div>
+          </div>
+        </div>
+        <button class="reset-btn" id="resetBtn" onclick="resetAll()">↺ Reset mese</button>
+      </div>
+    </div>
+    <!-- EXPORT -->
+    <div class="panel">
+      <div class="panel-header"><div class="dot" style="background:var(--accent)"></div><h2 id="h2Export">Esporta Calendario</h2></div>
+      <div class="export-section">
+        <div class="scope-btns">
+          <div class="scope-btn active" id="scopeMese" onclick="setScope('mese')" id="sbMonth">Mese</div>
+          <div class="scope-btn" id="scopeAnno" onclick="setScope('anno')" id="sbYear">Anno intero</div>
+        </div>
+        <div class="export-options">
+          <label class="export-option checked" id="optPresenze" onclick="toggleOpt(this)">
+            <div class="export-dot" style="background:var(--accent)"></div>
+            <div class="export-option-text"><span class="eo-main" id="eoPresence">Presenze ufficio</span><span class="eo-sub" id="eoAllDay">Evento tutto il giorno</span></div>
+            <div class="export-check">✓</div>
+          </label>
+          <label class="export-option checked" id="optSW" onclick="toggleOpt(this)">
+            <div class="export-dot" style="background:var(--sw)"></div>
+            <div class="export-option-text"><span class="eo-main">Smart working</span><span class="eo-sub" id="eoAllDay2">Evento tutto il giorno</span></div>
+            <div class="export-check">✓</div>
+          </label>
+          <label class="export-option checked" id="optFerie" onclick="toggleOpt(this)">
+            <div class="export-dot" style="background:var(--accent2)"></div>
+            <div class="export-option-text"><span class="eo-main" id="eoVac">Ferie</span><span class="eo-sub" id="eoAllDay3">Evento tutto il giorno</span></div>
+            <div class="export-check">✓</div>
+          </label>
+          <label class="export-option checked" id="optMalattia" onclick="toggleOpt(this)">
+            <div class="export-dot" style="background:var(--accent3)"></div>
+            <div class="export-option-text"><span class="eo-main" id="eoSick">Malattia</span><span class="eo-sub" id="eoAllDay4">Evento tutto il giorno</span></div>
+            <div class="export-check">✓</div>
+          </label>
+          <label class="export-option" id="optFestivita" onclick="toggleOpt(this)">
+            <div class="export-dot" style="background:var(--accent2);opacity:.5"></div>
+            <div class="export-option-text"><span class="eo-main" id="eoHols">Festività italiane</span><span class="eo-sub" id="eoInclude">Includi festivi nel file</span></div>
+            <div class="export-check"></div>
+          </label>
+        </div>
+        <button class="export-btn" onclick="esportaICS()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="exportBtnTxt">Scarica .ics</span>
+        </button>
+        <div class="export-note" id="exportNote">Compatibile con iPhone Calendar,<br>Google Calendar e Outlook</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<div class="ctx-menu" id="ctxMenu">
+  <div class="ctx-item ci-presence" data-stato="presenza" id="ctx-presenza">🏢 Presenza</div>
+  <div class="ctx-item ci-sw" data-stato="smartworking">💻 Smart working</div>
+  <div class="ctx-item ci-vacation" data-stato="ferie" id="ctx-ferie">☀ Ferie</div>
+  <div class="ctx-item ci-sick" data-stato="malattia" id="ctx-malattia">+ Malattia</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item ci-none" data-stato="none" id="ctx-none">✕ Nessuno</div>
+</div>
+
+<script>
+// ── I18N ──────────────────────────────────────────────
+const TR = {
+  it: {
+    appTitle:'Presenze <span>Ufficio</span>',
+    appSub:'Calcolo presenza minima · Frascati · 30% giorni lavorativi',
+    lbAnno:'Anno', lbMese:'Mese',
+    months:['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
+    wdays:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'],
+    wdShort:['Lun','Mar','Mer','Gio','Ven','Sab','Dom'],
+    h2Summary:'Riepilogo Mese', h2Cal:'Calendario Interattivo',
+    h2Hol:'Festività del Mese', h2Abs:'Assenze', h2Export:'Esporta Calendario',
+    calHint:'click destro per lo stato',
+    lgWork:'Lavorativo', lgPresence:'Presenza', lgSW:'Smart working',
+    lgVac:'Ferie', lgSick:'Malattia', lgHol:'Festività', lgWknd:'Weekend',
+    tooltip:'Clicca per ciclare: <strong style="color:var(--accent)">Presenza</strong> → <strong style="color:var(--sw)">Smart working</strong> → <strong style="color:var(--accent2)">Ferie</strong> → <strong style="color:var(--accent3)">Malattia</strong> → nessuno.',
+    lbSick:'Malattia', lbVac:'Ferie', lbDays:'Giorni nel mese',
+    resetBtn:'↺ Reset mese',
+    scopeMonth:'Mese', scopeYear:'Anno intero',
+    eoPresence:'Presenze ufficio', eoAllDay:'Evento tutto il giorno',
+    eoVac:'Ferie', eoSick:'Malattia', eoHols:'Festività italiane',
+    eoInclude:'Includi festivi nel file', exportBtnTxt:'Scarica .ics',
+    exportNote:'Compatibile con iPhone Calendar,<br>Google Calendar e Outlook',
+    ctxPresence:'🏢 Presenza', ctxVac:'☀ Ferie', ctxSick:'+ Malattia', ctxNone:'✕ Nessuno',
+    kpiDays:'Giorni del mese', kpiGross:'Lavorativi lordi', kpiHols:'Festività feriali',
+    kpiVac:'Ferie', kpiSick:'Malattia', kpiNet:'Lavorativi netti',
+    kpiThresh:'Soglia minima', kpiPresence:'Presenze ufficio', kpiSW:'Smart working',
+    kpiSurplus:'Surplus', kpiMissing:'Mancanti',
+    subMonFri:'Lun–Ven', subSubtracted:'Sottratte', subInMonth:'Nel mese',
+    subBase:'Base 30%', subCeil:'30% ceil', subSelected:'Selezionate',
+    subRemote:'Da remoto', subAbove:'Sopra soglia', subBelow:'Sotto soglia',
+    statusOk:'In regola', statusKo:'Non in regola',
+    statusWarn:'Warning — verificare settimana corta',
+    stMonthly:'mensile', stWeeksMissing:'Settimane mancanti',
+    stWeeksCovered:'Tutte le {n} settimane coperte',
+    stShortTitle:'⚠ Settimana corta',
+    stShortDetail:'{label} (W{w}): solo {n} gg lavorativi',
+    firstWeek:'Prima settimana', lastWeek:'Ultima settimana',
+    holWeekday:'Festivo feriale', holSat:'Sabato', holSun:'Domenica',
+    holNoImpact:'Non impatta calcolo', holLocal:'Festività locale',
+    noHolidays:'Nessuna festività questo mese',
+    weekNoPresence:'nessuna presenza',
+    icsPresence:'🏢 Presenza ufficio', icsSW:'💻 Smart working',
+    icsFerie:'☀️ Ferie', icsMalattia:'🤒 Malattia',
+    icsPresenceDesc:'Giorno di presenza in ufficio',
+    icsSWDesc:'Giorno di smart working', icsFerieDesc:'Giorno di ferie',
+    icsMalattiaDesc:'Giorno di malattia', icsHolLocal:'festività locale',
+    icsHolDesc:'Festività italiana', icsHolLocalDesc:'Festività italiana locale (Frascati)',
+    icsCalName:'Presenze Ufficio',
+    icsSelectOne:'⚠ Seleziona almeno un tipo di evento',
+    icsNoEvents:'⚠ Nessun evento da esportare nel periodo selezionato',
+    icsExported:'✓ Esportati {n} eventi → {f}',
+    presLabel:'presenze', threshLabel:'soglia mensile',
+  },
+  en: {
+    appTitle:'Office <span>Attendance</span>',
+    appSub:'Minimum presence calculator · Frascati · 30% working days',
+    lbAnno:'Year', lbMese:'Month',
+    months:['January','February','March','April','May','June','July','August','September','October','November','December'],
+    wdays:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+    wdShort:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    h2Summary:'Month Summary', h2Cal:'Interactive Calendar',
+    h2Hol:'Holidays This Month', h2Abs:'Absences', h2Export:'Export Calendar',
+    calHint:'right-click to set status',
+    lgWork:'Workday', lgPresence:'Office', lgSW:'Smart working',
+    lgVac:'Vacation', lgSick:'Sick leave', lgHol:'Holiday', lgWknd:'Weekend',
+    tooltip:'Click to cycle: <strong style="color:var(--accent)">Office</strong> → <strong style="color:var(--sw)">Smart working</strong> → <strong style="color:var(--accent2)">Vacation</strong> → <strong style="color:var(--accent3)">Sick leave</strong> → none.',
+    lbSick:'Sick leave', lbVac:'Vacation', lbDays:'Days in month',
+    resetBtn:'↺ Reset month',
+    scopeMonth:'Month', scopeYear:'Full year',
+    eoPresence:'Office attendance', eoAllDay:'All-day event',
+    eoVac:'Vacation', eoSick:'Sick leave', eoHols:'Italian holidays',
+    eoInclude:'Include holidays in file', exportBtnTxt:'Download .ics',
+    exportNote:'Compatible with iPhone Calendar,<br>Google Calendar and Outlook',
+    ctxPresence:'🏢 Office', ctxVac:'☀ Vacation', ctxSick:'+ Sick leave', ctxNone:'✕ None',
+    kpiDays:'Days in month', kpiGross:'Gross working days', kpiHols:'Public holidays',
+    kpiVac:'Vacation', kpiSick:'Sick leave', kpiNet:'Net working days',
+    kpiThresh:'Min. threshold', kpiPresence:'Office days', kpiSW:'Smart working',
+    kpiSurplus:'Surplus', kpiMissing:'Missing',
+    subMonFri:'Mon–Fri', subSubtracted:'Subtracted', subInMonth:'In month',
+    subBase:'Base 30%', subCeil:'30% ceil', subSelected:'Selected',
+    subRemote:'Remote', subAbove:'Above threshold', subBelow:'Below threshold',
+    statusOk:'Compliant', statusKo:'Non-compliant',
+    statusWarn:'Warning — check short week',
+    stMonthly:'monthly', stWeeksMissing:'Weeks missing',
+    stWeeksCovered:'All {n} weeks covered',
+    stShortTitle:'⚠ Short week',
+    stShortDetail:'{label} (W{w}): only {n} working days',
+    firstWeek:'First week', lastWeek:'Last week',
+    holWeekday:'Weekday holiday', holSat:'Saturday', holSun:'Sunday',
+    holNoImpact:'No impact on calculation', holLocal:'Local holiday',
+    noHolidays:'No holidays this month',
+    weekNoPresence:'no office day',
+    icsPresence:'🏢 Office attendance', icsSW:'💻 Smart working',
+    icsFerie:'☀️ Vacation', icsMalattia:'🤒 Sick leave',
+    icsPresenceDesc:'Office attendance day',
+    icsSWDesc:'Smart working day', icsFerieDesc:'Vacation day',
+    icsMalattiaDesc:'Sick leave day', icsHolLocal:'local holiday',
+    icsHolDesc:'Italian public holiday', icsHolLocalDesc:'Italian local holiday (Frascati)',
+    icsCalName:'Office Attendance',
+    icsSelectOne:'⚠ Select at least one event type',
+    icsNoEvents:'⚠ No events to export for the selected period',
+    icsExported:'✓ Exported {n} events → {f}',
+    presLabel:'days', threshLabel:'monthly threshold',
+  }
+};
+
+let lang = 'it';
+function T(k){ return TR[lang][k] || k; }
+
+function setLang(l) {
+  lang = l;
+  document.getElementById('btnIT').classList.toggle('active', l==='it');
+  document.getElementById('btnEN').classList.toggle('active', l==='en');
+  document.documentElement.lang = l;
+  applyLang();
+  render();
+}
+
+function applyLang() {
+  document.getElementById('appTitle').innerHTML = T('appTitle');
+  document.getElementById('appSubtitle').textContent = T('appSub');
+  document.getElementById('lbAnno').textContent = T('lbAnno');
+  document.getElementById('lbMese').textContent = T('lbMese');
+  document.getElementById('h2Summary').textContent = T('h2Summary');
+  document.getElementById('h2Cal').textContent = T('h2Cal');
+  document.getElementById('calHint').textContent = T('calHint');
+  document.getElementById('h2Hol').textContent = T('h2Hol');
+  document.getElementById('h2Abs').textContent = T('h2Abs');
+  document.getElementById('h2Export').textContent = T('h2Export');
+  document.getElementById('lgWork').textContent = T('lgWork');
+  document.getElementById('lgPresence').textContent = T('lgPresence');
+  document.getElementById('lgSW').textContent = T('lgSW');
+  document.getElementById('lgVac').textContent = T('lgVac');
+  document.getElementById('lgSick').textContent = T('lgSick');
+  document.getElementById('lgHol').textContent = T('lgHol');
+  document.getElementById('lgWknd').textContent = T('lgWknd');
+  document.getElementById('tooltipHint').innerHTML = T('tooltip');
+  document.getElementById('lbSick').textContent = T('lbSick');
+  document.getElementById('lbVac').textContent = T('lbVac');
+  document.getElementById('lbDays').textContent = T('lbDays');
+  document.getElementById('lbDays2').textContent = T('lbDays');
+  document.getElementById('resetBtn').textContent = T('resetBtn');
+  document.getElementById('scopeMese').textContent = T('scopeMonth');
+  document.getElementById('scopeAnno').textContent = T('scopeYear');
+  document.getElementById('eoPresence').textContent = T('eoPresence');
+  document.getElementById('eoAllDay').textContent = T('eoAllDay');
+  document.getElementById('eoAllDay2').textContent = T('eoAllDay');
+  document.getElementById('eoVac').textContent = T('eoVac');
+  document.getElementById('eoAllDay3').textContent = T('eoAllDay');
+  document.getElementById('eoSick').textContent = T('eoSick');
+  document.getElementById('eoAllDay4').textContent = T('eoAllDay');
+  document.getElementById('eoHols').textContent = T('eoHols');
+  document.getElementById('eoInclude').textContent = T('eoInclude');
+  document.getElementById('exportBtnTxt').textContent = T('exportBtnTxt');
+  document.getElementById('exportNote').innerHTML = T('exportNote');
+  document.getElementById('ctx-presenza').textContent = T('ctxPresence');
+  document.getElementById('ctx-ferie').textContent = T('ctxVac');
+  document.getElementById('ctx-malattia').textContent = T('ctxSick');
+  document.getElementById('ctx-none').textContent = T('ctxNone');
+  // Rebuild month select keeping current value
+  const sel = document.getElementById('selMese');
+  const cur = sel.value;
+  sel.innerHTML = T('months').map((m,i)=>`<option value="${i}">${m}</option>`).join('');
+  sel.value = cur;
+  // Weekday headers
+  const wds = T('wdShort');
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach((id,i)=>{
+    document.getElementById('wd'+id).textContent = wds[i];
+  });
+}
+
+// ── STATE ─────────────────────────────────────────────
+let anno = new Date().getFullYear();
+let mese = new Date().getMonth();
+let giorniStato = {};
+
+// ── SELETTORI ─────────────────────────────────────────
+const selAnno = document.getElementById('selAnno');
+const selMese = document.getElementById('selMese');
+for(let y=2025;y<=2035;y++){
+  const o=document.createElement('option');
+  o.value=y; o.textContent=y;
+  if(y===anno) o.selected=true;
+  selAnno.appendChild(o);
+}
+selAnno.addEventListener('change',()=>{ anno=+selAnno.value; resetMonth(); render(); });
+selMese.addEventListener('change',()=>{ mese=+selMese.value; resetMonth(); render(); });
+
+// ── PASQUA ────────────────────────────────────────────
+function pasqua(y){
+  const a=y%19,b=Math.floor(y/100),c=y%100;
+  const d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4;
+  const l=(32+2*e+2*i-h-k)%7,m2=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m2+114)/31)-1;
+  const day=((h+l-7*m2+114)%31)+1;
+  return new Date(y,month,day);
+}
+
+// ── FESTIVITÀ ─────────────────────────────────────────
+function getFestivita(y){
+  const p=pasqua(y);
+  const pq=new Date(p); pq.setDate(p.getDate()+1);
+  const fisse=[
+    {m:0,d:1,n:'Capodanno'},{m:0,d:6,n:'Epifania'},
+    {m:3,d:25,n:'Festa della Liberazione'},{m:4,d:1,n:'Festa dei Lavoratori'},
+    {m:4,d:3,n:'Santi Filippo e Giacomo',loc:true},{m:5,d:2,n:'Festa della Repubblica'},
+    {m:7,d:15,n:'Ferragosto'},{m:10,d:1,n:'Ognissanti'},
+    {m:11,d:8,n:'Immacolata Concezione'},{m:11,d:25,n:'Natale'},{m:11,d:26,n:'Santo Stefano'},
+  ];
+  const res=fisse.map(f=>({data:new Date(y,f.m,f.d),nome:f.n,locale:!!f.loc}));
+  res.push({data:p,nome:'Pasqua',locale:false});
+  res.push({data:pq,nome:"Lunedì dell'Angelo",locale:false});
+  return res.sort((a,b)=>a.data-b.data);
+}
+
+function dateKey(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+// ── ISO WEEK ──────────────────────────────────────────
+function isoWeek(date){
+  const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));
+  const dn=d.getUTCDay()||7;
+  d.setUTCDate(d.getUTCDate()+4-dn);
+  const ys=new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d-ys)/86400000)+1)/7);
+}
+function isoWeekYear(date){
+  const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));
+  const dn=d.getUTCDay()||7;
+  d.setUTCDate(d.getUTCDate()+4-dn);
+  return d.getUTCFullYear();
+}
+
+// ── CALCOLA MESE ──────────────────────────────────────
+function calcolaMese(y,m){
+  const festAll=getFestivita(y);
+  const festMese=festAll.filter(f=>f.data.getMonth()===m);
+  const festKeys=new Set(festMese.map(f=>dateKey(f.data)));
+  const totDays=new Date(y,m+1,0).getDate();
+  let lavorativiLordi=0,festiviFeriali=0;
+  for(let d=1;d<=totDays;d++){
+    const data=new Date(y,m,d), dow=data.getDay();
+    if(dow>=1&&dow<=5){ lavorativiLordi++; if(festKeys.has(dateKey(data))) festiviFeriali++; }
+  }
+  let presenzaCal=0,ferieCal=0,malattiaCal=0,swCal=0;
+  for(const [k,v] of Object.entries(giorniStato)){
+    const dd=new Date(k);
+    if(dd.getFullYear()===y&&dd.getMonth()===m){
+      if(v==='presenza') presenzaCal++;
+      else if(v==='ferie') ferieCal++;
+      else if(v==='malattia') malattiaCal++;
+      else if(v==='smartworking') swCal++;
+    }
+  }
+  const netti=Math.max(0,lavorativiLordi-festiviFeriali-ferieCal-malattiaCal);
+  const soglia=Math.ceil(netti*0.30);
+  const diff=presenzaCal-soglia;
+
+  // Settimane
+  const settMap={};
+  for(let d=1;d<=totDays;d++){
+    const data=new Date(y,m,d), dow=data.getDay(), key=dateKey(data);
+    const iw=isoWeek(data), iy=isoWeekYear(data), wk=`${iy}-W${iw}`;
+    if(!settMap[wk]) settMap[wk]={wk,iw,iy,giorniLavLordi:0,giorniLavNetti:0,presenze:0,isShortWeek:false};
+    const w=settMap[wk];
+    const isWe=dow===0||dow===6, isHol=festKeys.has(key), stato=giorniStato[key]||'none';
+    if(!isWe&&!isHol){ w.giorniLavLordi++; if(stato!=='ferie'&&stato!=='malattia') w.giorniLavNetti++; }
+    if(stato==='presenza') w.presenze++;
+  }
+  const settimane=Object.values(settMap).sort((a,b)=>a.iy!==b.iy?a.iy-b.iy:a.iw-b.iw);
+  settimane.forEach(w=>{ w.devePresenza=w.giorniLavNetti>0; w.haPresenza=w.presenze>0; });
+
+  let settOkCount=0, settKo=[];
+  settimane.forEach(w=>{ if(w.devePresenza){ if(w.haPresenza) settOkCount++; else settKo.push(w.iw); }});
+  const settConObbligo=settimane.filter(w=>w.devePresenza).length;
+
+  // Settimane corte
+  const settValide=settimane.filter(w=>w.giorniLavLordi>0);
+  const prima=settValide[0]||null, ultima=settValide.length>1?settValide[settValide.length-1]:null;
+  if(prima) prima.isShortWeek=prima.giorniLavLordi<5;
+  if(ultima&&ultima.wk!==prima?.wk) ultima.isShortWeek=ultima.giorniLavLordi<5;
+  const shortWarnings=[];
+  if(prima?.isShortWeek) shortWarnings.push({labelKey:'firstWeek',sett:prima});
+  if(ultima?.isShortWeek&&ultima.wk!==prima?.wk) shortWarnings.push({labelKey:'lastWeek',sett:ultima});
+
+  const okMensile=presenzaCal>=soglia, okSettimanale=settKo.length===0;
+  const ok=okMensile&&okSettimanale;
+  return {
+    totDays,lavorativiLordi,festiviFeriali,ferieCal,malattiaCal,swCal,
+    netti,soglia,presenzaCal,diff,ok,okMensile,okSettimanale,
+    settimane,settConObbligo,settOkCount,settKo,shortWarnings,
+    festMese,festKeys
+  };
+}
+
+// ── RENDER ────────────────────────────────────────────
+function render(){
+  const c=calcolaMese(anno,mese);
+  renderKPI(c); renderStatus(c); renderCalendar(c); renderHolidays(c); syncCounters(c);
+}
+
+function renderKPI(c){
+  const grid=document.getElementById('kpiGrid');
+  const cards=[
+    {l:T('kpiDays'),    v:c.totDays,     s:T('months')[mese]+' '+anno,  cl:''},
+    {l:T('kpiGross'),   v:c.lavorativiLordi, s:T('subMonFri'),         cl:''},
+    {l:T('kpiHols'),    v:c.festiviFeriali,  s:T('subSubtracted'),      cl:''},
+    {l:T('kpiVac'),     v:c.ferieCal,    s:T('subInMonth'),             cl:''},
+    {l:T('kpiSick'),    v:c.malattiaCal, s:T('subInMonth'),             cl:''},
+    {l:T('kpiNet'),     v:c.netti,       s:T('subBase'),                cl:'teal'},
+    {l:T('kpiThresh'),  v:c.soglia,      s:T('subCeil'),                cl:'amber'},
+    {l:T('kpiPresence'),v:c.presenzaCal, s:T('subSelected'),            cl:c.ok?'teal':'red'},
+    {l:T('kpiSW'),      v:c.swCal,       s:T('subRemote'),              cl:'sw'},
+    {l:c.diff>=0?T('kpiSurplus'):T('kpiMissing'), v:Math.abs(c.diff), s:c.ok?T('subAbove'):T('subBelow'), cl:c.ok?'teal':'red'},
+  ];
+  grid.innerHTML=cards.map(card=>`
+    <div class="kpi-card ${card.cl==='red'?'warn':''}">
+      <div class="kpi-label">${card.l}</div>
+      <div class="kpi-value ${card.cl}">${card.v}</div>
+      <div class="kpi-sub">${card.s}</div>
+    </div>`).join('');
+}
+
+function renderStatus(c){
+  const bar=document.getElementById('statusBar');
+  const pct=c.soglia>0?Math.min(100,(c.presenzaCal/c.soglia)*100):100;
+  const hasShortWarn=!c.ok&&c.shortWarnings.length>0;
+  const cls=c.ok?'ok':hasShortWarn?'warn':'ko';
+  const icon=c.ok?'✓':hasShortWarn?'⚠':'!';
+  const label=c.ok?T('statusOk'):hasShortWarn?T('statusWarn'):T('statusKo');
+  const fillCls=c.okMensile?'ok':(hasShortWarn?'warn-f':'ko');
+
+  const weekDots=c.settimane.filter(w=>w.devePresenza).map(w=>
+    `<span title="W${w.iw}" style="width:9px;height:9px;border-radius:2px;background:${w.haPresenza?'var(--green)':'var(--red)'};display:inline-block;flex-shrink:0"></span>`
+  ).join('');
+
+  const koLabel=c.settKo.length>0
+    ?`${T('stWeeksMissing')}: W${c.settKo.join(', W')}`
+    :T('stWeeksCovered').replace('{n}',c.settConObbligo);
+
+  let shortHtml='';
+  if(c.shortWarnings.length>0){
+    const items=c.shortWarnings.map(sw=>{
+      const detail=T('stShortDetail').replace('{label}',T(sw.labelKey)).replace('{w}',sw.sett.iw).replace('{n}',sw.sett.giorniLavLordi);
+      return `<span style="display:inline-flex;align-items:center;gap:.35rem"><span style="width:7px;height:7px;border-radius:2px;background:var(--accent2);display:inline-block;flex-shrink:0"></span><span>${detail}</span></span>`;
+    }).join('');
+    shortHtml=`<div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:.5rem .7rem;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:6px;font-size:.67rem;font-family:'DM Mono',monospace;color:var(--accent2)">
+      <span style="font-weight:600;flex-shrink:0">${T('stShortTitle')}</span>
+      <span style="display:inline-flex;flex-wrap:wrap;gap:.65rem">${items}</span>
+    </div>`;
+  }
+
+  bar.className=`status-bar status-${cls}`;
+  bar.innerHTML=`<div style="display:flex;flex-direction:column;gap:.55rem;width:100%">
+    <div style="display:flex;align-items:center;gap:.9rem;flex-wrap:wrap">
+      <div class="status-icon">${icon}</div>
+      <div class="status-label">${label}</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-left:auto;font-size:.67rem;font-family:'DM Mono',monospace">
+        <span style="display:inline-flex;align-items:center;gap:.28rem">
+          <span style="width:9px;height:9px;border-radius:50%;background:${c.okMensile?'var(--green)':'var(--red)'};display:inline-block;flex-shrink:0"></span>
+          <span style="color:${c.okMensile?'var(--green)':'var(--red)'}">30% ${T('stMonthly')} (${c.presenzaCal}/${c.soglia})</span>
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:.28rem">
+          <span style="width:9px;height:9px;border-radius:50%;background:${c.okSettimanale?'var(--green)':'var(--red)'};display:inline-block;flex-shrink:0"></span>
+          <span style="color:${c.okSettimanale?'var(--green)':'var(--red)'}">1/week (${c.settOkCount}/${c.settConObbligo})</span>
+          <span style="display:inline-flex;gap:2px;align-items:center">${weekDots}</span>
+        </span>
+      </div>
+    </div>
+    <div class="progress-wrap" style="min-width:0">
+      <div class="progress-track">
+        <div class="progress-fill ${fillCls}" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-info">
+        <span>${c.presenzaCal} ${T('presLabel')} · ${T('threshLabel')}: ${c.soglia}</span>
+        <span style="color:${c.okSettimanale?'var(--green)':'var(--red)'}">${koLabel}</span>
+      </div>
+    </div>
+    ${shortHtml}
+  </div>`;
+}
+
+function renderCalendar(c){
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  const weekMap={};
+  c.settimane.forEach(w=>weekMap[w.wk]=w);
+  const totDays=new Date(anno,mese+1,0).getDate();
+  let startDow=new Date(anno,mese,1).getDay();
+  startDow=(startDow+6)%7;
+  const cells=[];
+  for(let i=0;i<startDow;i++) cells.push({type:'empty'});
+  for(let d=1;d<=totDays;d++) cells.push({type:'day',d,data:new Date(anno,mese,d)});
+  while(cells.length%7!==0) cells.push({type:'empty'});
+
+  for(let row=0;row<cells.length/7;row++){
+    const rowCells=cells.slice(row*7,row*7+7);
+    const firstDay=rowCells.find(x=>x.type==='day');
+    let wi=null;
+    if(firstDay){ const wk=`${isoWeekYear(firstDay.data)}-W${isoWeek(firstDay.data)}`; wi=weekMap[wk]; }
+    const isWarn=wi&&wi.devePresenza&&!wi.haPresenza;
+    const isShort=wi&&wi.isShortWeek;
+
+    // Week label
+    const wLabel=document.createElement('div');
+    wLabel.className='week-row-label';
+    if(wi){
+      const bc=isWarn?'warn-w':isShort?'short-w':'';
+      const dot=isWarn?'<div class="week-warn-dot"></div>':isShort?'<div class="week-short-dot"></div>':'';
+      wLabel.innerHTML=`<span class="week-num-badge ${bc}">W${wi.iw}</span>${dot}`;
+    }
+    grid.appendChild(wLabel);
+
+    // Day cells
+    rowCells.forEach(cell=>{
+      const el=document.createElement('div');
+      if(cell.type==='empty'){ el.className='cal-day empty'; grid.appendChild(el); return; }
+      const {d,data}=cell;
+      const dow=data.getDay(), key=dateKey(data);
+      const isWe=dow===0||dow===6, isHol=c.festKeys.has(key), stato=giorniStato[key]||'none';
+      el.className='cal-day';
+      if(isWe&&isHol) el.classList.add('holiday','weekend');
+      else if(isWe) el.classList.add('weekend');
+      else if(isHol) el.classList.add('holiday');
+      else{
+        el.classList.add('workday');
+        if(stato!=='none') el.classList.add('s-'+stato);
+        if(isWarn&&stato==='none') el.classList.add('week-warn-outline');
+      }
+      const icons={'presenza':'🏢','smartworking':'💻','ferie':'☀','malattia':'+'};
+      const icon=icons[stato]||(isHol&&!isWe?'✦':'');
+      el.innerHTML=`<span class="day-num">${d}</span>${icon?`<span style="font-size:.52rem;line-height:1;opacity:.85">${icon}</span>`:''}${stato!=='none'&&!isWe&&!isHol?'<span class="day-dot"></span>':''}`;
+      if(!isWe&&!isHol){
+        el.addEventListener('click',e=>{
+          if(e.button!==0) return;
+          const cycle={'none':'presenza','presenza':'smartworking','smartworking':'ferie','ferie':'malattia','malattia':'none'};
+          const ns=cycle[stato];
+          if(ns==='none') delete giorniStato[key]; else giorniStato[key]=ns;
+          render();
+        });
+        el.addEventListener('contextmenu',e=>{ e.preventDefault(); showCtx(e.clientX,e.clientY,key); });
+      }
+      grid.appendChild(el);
+    });
+  }
+}
+
+function renderHolidays(c){
+  const list=document.getElementById('holidaysList');
+  if(c.festMese.length===0){
+    list.innerHTML=`<div class="empty-state"><div class="ei">🗓</div>${T('noHolidays')}</div>`;
+    return;
+  }
+  list.innerHTML=c.festMese.map(f=>{
+    const dow=f.data.getDay(), isWe=dow===0||dow===6;
+    const dowName=T('wdays')[dow];
+    const dateStr=`${f.data.getDate()} ${T('months')[f.data.getMonth()]} ${f.data.getFullYear()}`;
+    let badges='';
+    if(!isWe) badges+=`<span class="badge badge-f">${T('holWeekday')}</span>`;
+    if(dow===6) badges+=`<span class="badge badge-s">${T('holSat')}</span>`;
+    if(dow===0) badges+=`<span class="badge badge-s">${T('holSun')}</span>`;
+    if(isWe)  badges+=`<span class="badge badge-nc">${T('holNoImpact')}</span>`;
+    if(f.locale) badges+=`<span class="badge badge-loc">${T('holLocal')}</span>`;
+    return `<div class="holiday-item ${isWe?'hol-we':''}">
+      <div class="holiday-name">${f.nome}</div>
+      <div class="holiday-date">${dowName} ${dateStr}</div>
+      <div class="holiday-badges">${badges}</div>
+    </div>`;
+  }).join('');
+}
+
+function syncCounters(c){
+  document.getElementById('malDisplay').textContent=c.malattiaCal;
+  document.getElementById('ferDisplay').textContent=c.ferieCal;
+}
+
+// ── NUM BUTTONS ───────────────────────────────────────
+function adjustNum(tipo,delta){
+  const c=calcolaMese(anno,mese);
+  const lav=c.lavorativiLordi-c.festiviFeriali;
+  const cur=tipo==='malattia'?c.malattiaCal:c.ferieCal;
+  const other=tipo==='malattia'?c.ferieCal:c.malattiaCal;
+  const nv=Math.max(0,Math.min(cur+delta,lav-other));
+  applyNum(tipo,nv,c);
+  render();
+}
+function applyNum(tipo,target,c){
+  const keys=Object.entries(giorniStato).filter(([k,v])=>{const d=new Date(k);return d.getFullYear()===anno&&d.getMonth()===mese&&v===tipo;}).map(([k])=>k);
+  const diff=target-keys.length;
+  if(diff>0){
+    let added=0; const tot=new Date(anno,mese+1,0).getDate();
+    for(let d=1;d<=tot&&added<diff;d++){
+      const data=new Date(anno,mese,d), key=dateKey(data), dow=data.getDay();
+      if(dow>=1&&dow<=5&&!c.festKeys.has(key)&&!giorniStato[key]){ giorniStato[key]=tipo; added++; }
+    }
+  } else if(diff<0){
+    let rem=0; const toRem=Math.abs(diff);
+    for(const k of [...keys].reverse()){ if(rem>=toRem) break; delete giorniStato[k]; rem++; }
+  }
+}
+
+// ── CONTEXT MENU ─────────────────────────────────────
+let ctxKey=null;
+const ctxMenu=document.getElementById('ctxMenu');
+function showCtx(x,y,key){
+  ctxKey=key;
+  ctxMenu.style.left=Math.min(x,window.innerWidth-165)+'px';
+  ctxMenu.style.top=Math.min(y,window.innerHeight-165)+'px';
+  ctxMenu.classList.add('show');
+}
+ctxMenu.querySelectorAll('.ctx-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    const s=item.dataset.stato;
+    if(s==='none') delete giorniStato[ctxKey]; else giorniStato[ctxKey]=s;
+    ctxMenu.classList.remove('show'); render();
+  });
+});
+document.addEventListener('click',e=>{ if(!ctxMenu.contains(e.target)) ctxMenu.classList.remove('show'); });
+document.addEventListener('scroll',()=>ctxMenu.classList.remove('show'));
+
+// ── RESET ─────────────────────────────────────────────
+function resetMonth(){
+  for(const k of Object.keys(giorniStato)){
+    const d=new Date(k);
+    if(d.getFullYear()===anno&&d.getMonth()===mese) delete giorniStato[k];
+  }
+}
+function resetAll(){ resetMonth(); render(); }
+
+// ── EXPORT ICS ────────────────────────────────────────
+let exportScope='mese';
+function setScope(s){
+  exportScope=s;
+  document.getElementById('scopeMese').classList.toggle('active',s==='mese');
+  document.getElementById('scopeAnno').classList.toggle('active',s==='anno');
+}
+function toggleOpt(el){ el.classList.toggle('checked'); el.querySelector('.export-check').textContent=el.classList.contains('checked')?'✓':''; }
+function icsDate(d){ return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`; }
+function icsNext(d){ const n=new Date(d); n.setDate(n.getDate()+1); return icsDate(n); }
+function icsStamp(){ return new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,''); }
+function buildEvent(summary,date,desc){
+  const ds=icsDate(date), de=icsNext(date), st=icsStamp();
+  const uid=`${summary.replace(/\s+/g,'-').toLowerCase()}-${ds}@frascati`;
+  return ['BEGIN:VEVENT',`UID:${uid}`,`DTSTAMP:${st}`,`DTSTART;VALUE=DATE:${ds}`,`DTEND;VALUE=DATE:${de}`,`SUMMARY:${summary}`,desc?`DESCRIPTION:${desc}`:null,'TRANSP:TRANSPARENT','END:VEVENT'].filter(Boolean).join('\r\n');
+}
+function esportaICS(){
+  const iP=document.getElementById('optPresenze').classList.contains('checked');
+  const iS=document.getElementById('optSW').classList.contains('checked');
+  const iF=document.getElementById('optFerie').classList.contains('checked');
+  const iM=document.getElementById('optMalattia').classList.contains('checked');
+  const iH=document.getElementById('optFestivita').classList.contains('checked');
+  if(!iP&&!iS&&!iF&&!iM&&!iH){ showToast(T('icsSelectOne')); return; }
+  const mesi=exportScope==='anno'?Array.from({length:12},(_,i)=>i):[mese];
+  const events=[];
+  for(const m of mesi){
+    const c=calcolaMese(anno,m), mn=T('months')[m], tot=new Date(anno,m+1,0).getDate();
+    for(let d=1;d<=tot;d++){
+      const data=new Date(anno,m,d), key=dateKey(data), stato=giorniStato[key];
+      if(!stato) continue;
+      if(stato==='presenza'&&iP) events.push(buildEvent(T('icsPresence'),data,`${T('icsPresenceDesc')} - ${mn} ${anno}`));
+      else if(stato==='smartworking'&&iS) events.push(buildEvent(T('icsSW'),data,`${T('icsSWDesc')} - ${mn} ${anno}`));
+      else if(stato==='ferie'&&iF) events.push(buildEvent(T('icsFerie'),data,`${T('icsFerieDesc')} - ${mn} ${anno}`));
+      else if(stato==='malattia'&&iM) events.push(buildEvent(T('icsMalattia'),data,`${T('icsMalattiaDesc')} - ${mn} ${anno}`));
+    }
+    if(iH) c.festMese.forEach(f=>{
+      const lbl=f.locale?`${f.nome} (${T('icsHolLocal')})`:f.nome;
+      events.push(buildEvent(`✦ ${lbl}`,f.data,f.locale?T('icsHolLocalDesc'):T('icsHolDesc')));
+    });
+  }
+  if(events.length===0){ showToast(T('icsNoEvents')); return; }
+  const calName=exportScope==='anno'?`${T('icsCalName')} ${anno}`:`${T('icsCalName')} ${T('months')[mese]} ${anno}`;
+  const filename=exportScope==='anno'?`presenze-${anno}.ics`:`presenze-${anno}-${String(mese+1).padStart(2,'0')}.ics`;
+  const content=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Presenze Ufficio Frascati//IT',`X-WR-CALNAME:${calName}`,'X-WR-TIMEZONE:Europe/Rome','CALSCALE:GREGORIAN','METHOD:PUBLISH',...events,'END:VCALENDAR'].join('\r\n');
+  const blob=new Blob([content],{type:'text/calendar;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast(T('icsExported').replace('{n}',events.length).replace('{f}',filename));
+}
+
+// ── TOAST ─────────────────────────────────────────────
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// ── INIT ──────────────────────────────────────────────
+// Fix: renderKPI uses c.presenzaCal not c.presenze
+// (already consistent with calcolaMese return value)
+applyLang();
+selMese.value=mese;
+render();
+</script>
+</body>
+</html>

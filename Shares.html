@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulatore Calcolo Azioni</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Theme light (Default) */
+      --bg-body: #f1f5f9;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --input-bg: #f8fafc;
+      --input-border: #cbd5e1;
+      --input-focus: #3b82f6;
+      --accent-primary: #2563eb;
+      --accent-hover: #1d4ed8;
+      --profit: #10b981;
+      --profit-bg: #ecfdf5;
+      --loss: #ef4444;
+      --loss-bg: #fef2f2;
+      --tax: #f59e0b;
+      --tax-bg: #fffbeb;
+      --dca-bg: #f0f9ff;
+      --dca-border: #0284c7;
+      --shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+      --toggle-bg: #e2e8f0;
+      --toggle-active: #ffffff;
+    }
+
+    [data-theme="dark"] {
+      --bg-body: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: #0f172a;
+      --input-border: #334155;
+      --input-focus: #60a5fa;
+      --accent-primary: #3b82f6;
+      --accent-hover: #60a5fa;
+      --profit: #34d399;
+      --profit-bg: rgba(16, 185, 129, 0.12);
+      --loss: #f87171;
+      --loss-bg: rgba(239, 68, 68, 0.12);
+      --tax: #fbbf24;
+      --tax-bg: rgba(245, 158, 11, 0.12);
+      --dca-bg: rgba(2, 132, 199, 0.12);
+      --dca-border: #38bdf8;
+      --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+      --toggle-bg: #0f172a;
+      --toggle-active: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+    }
+
+    .container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 32px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: var(--shadow);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .title-area h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .title-area p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 4px 0 0 0;
+    }
+
+    .theme-toggle {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--input-focus);
+    }
+
+    .theme-toggle svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .mode-switch {
+      display: flex;
+      background-color: var(--toggle-bg);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .mode-btn.active {
+      background-color: var(--toggle-active);
+      color: var(--text-main);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper span {
+      position: absolute;
+      left: 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px 12px 36px;
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--text-main);
+      font-weight: 600;
+      outline: none;
+    }
+
+    input.no-symbol {
+      padding-left: 14px;
+    }
+
+    input:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .results-card {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 28px;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .result-item:first-child {
+      padding-top: 0;
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .result-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    .badge.profit {
+      background-color: var(--profit-bg);
+      color: var(--profit);
+    }
+
+    .badge.loss {
+      background-color: var(--loss-bg);
+      color: var(--loss);
+    }
+
+    .tax-box {
+      margin-top: 14px;
+      padding: 14px;
+      background-color: var(--tax-bg);
+      border: 1px solid var(--tax);
+      border-radius: 12px;
+      display: none;
+    }
+
+    .tax-box-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--tax);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .tax-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      margin-bottom: 6px;
+    }
+
+    .tax-row:last-child {
+      margin-bottom: 0;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(245, 158, 11, 0.4);
+      font-weight: 700;
+    }
+
+    /* DCA Section */
+    .section-divider {
+      margin: 32px 0 24px 0;
+      border: 0;
+      border-top: 1px dashed var(--card-border);
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dca-box {
+      margin-top: 20px;
+      padding: 16px;
+      background-color: var(--dca-bg);
+      border: 1px solid var(--dca-border);
+      border-radius: 14px;
+      display: none;
+    }
+
+    .dca-box-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--dca-border);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+
+    .dca-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      margin-bottom: 6px;
+    }
+
+    .dca-row:last-child {
+      margin-bottom: 0;
+      padding-top: 6px;
+      border-top: 1px dashed var(--dca-border);
+      font-weight: 700;
+    }
+
+    .error-msg {
+      color: var(--loss);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 6px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <div class="title-area">
+        <h1>Trade Tracker</h1>
+        <p>Simulatore di rendimento e media prezzo</p>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Cambia tema">
+        <svg id="sunIcon" style="display: none;" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="moonIcon" viewBox="0 0 24 24">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Selettore Modalità -->
+    <div class="mode-switch">
+      <button class="mode-btn active" id="btnCapitalMode">Capitale Investito</button>
+      <button class="mode-btn" id="btnSharesMode">N. Azioni</button>
+    </div>
+
+    <div class="form-group">
+      <label for="buyPrice">Prezzo di Acquisto Iniziale</label>
+      <div class="input-wrapper">
+        <span>€</span>
+        <input type="number" id="buyPrice" step="0.0001" placeholder="10,50">
+      </div>
+    </div>
+
+    <!-- Campo Capitale Investito -->
+    <div class="form-group" id="groupInvestedCapital">
+      <label for="investedCapital">Capitale Investito</label>
+      <div class="input-wrapper">
+        <span>€</span>
+        <input type="number" id="investedCapital" step="0.01" placeholder="1000,00">
+      </div>
+    </div>
+
+    <!-- Campo Numero Azioni -->
+    <div class="form-group" id="groupSharesCount" style="display: none;">
+      <label for="sharesInput">Numero di Azioni</label>
+      <div class="input-wrapper">
+        <input type="number" id="sharesInput" class="no-symbol" step="1" placeholder="100">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="sellPrice">Prezzo di Target / Rivendita</label>
+      <div class="input-wrapper">
+        <span>€</span>
+        <input type="number" id="sellPrice" step="0.0001" placeholder="12,00">
+      </div>
+    </div>
+
+    <!-- Dashboard Risultati Vendita -->
+    <div class="results-card">
+      <div class="result-item">
+        <span class="result-label" id="labelOutput1">Azioni Stimate</span>
+        <span class="result-value" id="valOutput1">0</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label" id="labelOutput2">Capitale Investito</span>
+        <span class="result-value" id="valOutput2">€ 0,00</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">Capitale Lordo Finale</span>
+        <span class="result-value" id="theoreticalCapital">€ 0,00</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">Guadagno / Perdita (Lordo)</span>
+        <span id="profitContainer">
+          <span class="result-value" id="profitDifference">€ 0,00 (0,00%)</span>
+        </span>
+      </div>
+
+      <!-- Box calcolo plusvalenza e tasse 26% -->
+      <div class="tax-box" id="taxBox">
+        <div class="tax-box-title">Dettaglio Plusvalenza (Tassazione 26%)</div>
+        <div class="tax-row">
+          <span>Tasse sull'utile (26%):</span>
+          <span id="taxAmount" style="color: var(--loss);">€ 0,00</span>
+        </div>
+        <div class="tax-row">
+          <span>Guadagno Netto:</span>
+          <span id="netProfit" style="color: var(--profit);">€ 0,00</span>
+        </div>
+        <div class="tax-row">
+          <span>Capitale Netto Finale:</span>
+          <span id="netTotal">€ 0,00</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- SEZIONE CALCOLO MEDIA AL RIBASSO -->
+    <div class="section-title">
+      📉 Abbassa Prezzo Medio (DCA)
+    </div>
+
+    <div class="form-group">
+      <label for="currentMarketPrice">Prezzo Attuale di Mercato</label>
+      <div class="input-wrapper">
+        <span>€</span>
+        <input type="number" id="currentMarketPrice" step="0.0001" placeholder="8,00">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="targetAveragePrice">Prezzo Medio Obiettivo</label>
+      <div class="input-wrapper">
+        <span>€</span>
+        <input type="number" id="targetAveragePrice" step="0.0001" placeholder="9,00">
+      </div>
+      <div class="error-msg" id="dcaError">Il prezzo obiettivo deve essere compreso tra il prezzo attuale e il prezzo d'acquisto iniziale.</div>
+    </div>
+
+    <!-- Box Risultati Media al Ribasso -->
+    <div class="dca-box" id="dcaBox">
+      <div class="dca-box-title">Piano di Integrazione</div>
+      <div class="dca-row">
+        <span>Nuove Azioni da Acquistare:</span>
+        <span id="newSharesNeeded" style="font-weight: 700;">0</span>
+      </div>
+      <div class="dca-row">
+        <span>Nuovo Capitale da Investire:</span>
+        <span id="newCapitalNeeded" style="font-weight: 700; color: var(--dca-border);">€ 0,00</span>
+      </div>
+      <div class="dca-row">
+        <span>Totale Azioni Complessivo:</span>
+        <span id="totalSharesAfterDca">0</span>
+      </div>
+      <div class="dca-row">
+        <span>Capitale Totale Investito:</span>
+        <span id="totalCapitalAfterDca">€ 0,00</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- GESTIONE TEMA CHIARO / SCURO ---
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      }
+      localStorage.setItem('theme', theme);
+    }
+
+    applyTheme(currentTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme(currentTheme);
+    });
+
+    // --- SWITCH MODALITÀ (Capitale vs N. Azioni) ---
+    let currentMode = 'capital';
+
+    const btnCapitalMode = document.getElementById('btnCapitalMode');
+    const btnSharesMode = document.getElementById('btnSharesMode');
+
+    const groupInvestedCapital = document.getElementById('groupInvestedCapital');
+    const groupSharesCount = document.getElementById('groupSharesCount');
+
+    const labelOutput1 = document.getElementById('labelOutput1');
+    const labelOutput2 = document.getElementById('labelOutput2');
+
+    btnCapitalMode.addEventListener('click', () => {
+      currentMode = 'capital';
+      btnCapitalMode.classList.add('active');
+      btnSharesMode.classList.remove('active');
+
+      groupInvestedCapital.style.display = 'block';
+      groupSharesCount.style.display = 'none';
+
+      labelOutput1.textContent = 'Azioni Stimate';
+      labelOutput2.textContent = 'Capitale Investito';
+
+      calculate();
+    });
+
+    btnSharesMode.addEventListener('click', () => {
+      currentMode = 'shares';
+      btnSharesMode.classList.add('active');
+      btnCapitalMode.classList.remove('active');
+
+      groupInvestedCapital.style.display = 'none';
+      groupSharesCount.style.display = 'block';
+
+      labelOutput1.textContent = 'Numero Azioni';
+      labelOutput2.textContent = 'Capitale Investito';
+
+      calculate();
+    });
+
+    // --- GESTIONE CALCOLI ---
+    const buyPriceInput = document.getElementById('buyPrice');
+    const investedCapitalInput = document.getElementById('investedCapital');
+    const sharesInput = document.getElementById('sharesInput');
+    const sellPriceInput = document.getElementById('sellPrice');
+
+    const currentMarketPriceInput = document.getElementById('currentMarketPrice');
+    const targetAveragePriceInput = document.getElementById('targetAveragePrice');
+
+    const valOutput1 = document.getElementById('valOutput1');
+    const valOutput2 = document.getElementById('valOutput2');
+    const theoreticalCapitalEl = document.getElementById('theoreticalCapital');
+    const profitDifferenceEl = document.getElementById('profitDifference');
+
+    // Elementi Tassazione
+    const taxBox = document.getElementById('taxBox');
+    const taxAmountEl = document.getElementById('taxAmount');
+    const netProfitEl = document.getElementById('netProfit');
+    const netTotalEl = document.getElementById('netTotal');
+
+    // Elementi DCA
+    const dcaBox = document.getElementById('dcaBox');
+    const dcaError = document.getElementById('dcaError');
+    const newSharesNeededEl = document.getElementById('newSharesNeeded');
+    const newCapitalNeededEl = document.getElementById('newCapitalNeeded');
+    const totalSharesAfterDcaEl = document.getElementById('totalSharesAfterDca');
+    const totalCapitalAfterDcaEl = document.getElementById('totalCapitalAfterDca');
+
+    function calculate() {
+      const buyPrice = parseFloat(buyPriceInput.value);
+      const sellPrice = parseFloat(sellPriceInput.value);
+
+      let investedCapital = 0;
+      let sharesCount = 0;
+
+      if (!buyPrice || buyPrice <= 0) {
+        resetOutputs();
+        calculateDCA(0, 0, 0);
+        return;
+      }
+
+      if (currentMode === 'capital') {
+        investedCapital = parseFloat(investedCapitalInput.value);
+        if (!investedCapital || investedCapital <= 0) {
+          resetOutputs();
+          calculateDCA(0, 0, 0);
+          return;
+        }
+        sharesCount = investedCapital / buyPrice;
+      } else {
+        sharesCount = parseFloat(sharesInput.value);
+        if (!sharesCount || sharesCount <= 0) {
+          resetOutputs();
+          calculateDCA(0, 0, 0);
+          return;
+        }
+        investedCapital = sharesCount * buyPrice;
+      }
+
+      valOutput1.textContent = sharesCount.toLocaleString('it-IT', { maximumFractionDigits: 4 });
+      valOutput2.textContent = '€ ' + investedCapital.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      // --- CALCOLO VENDITA & TASSE ---
+      if (!sellPrice || sellPrice <= 0) {
+        theoreticalCapitalEl.textContent = '€ 0,00';
+        profitDifferenceEl.textContent = '€ 0,00 (0,00%)';
+        profitDifferenceEl.className = 'result-value';
+        taxBox.style.display = 'none';
+      } else {
+        const theoreticalCapital = sharesCount * sellPrice;
+        const profit = theoreticalCapital - investedCapital;
+        const profitPercentage = (profit / investedCapital) * 100;
+
+        theoreticalCapitalEl.textContent = '€ ' + theoreticalCapital.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        const sign = profit >= 0 ? '+' : '';
+        const formattedProfit = '€ ' + profit.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+          ' (' + sign + profitPercentage.toFixed(2) + '%)';
+
+        profitDifferenceEl.textContent = formattedProfit;
+
+        if (profit > 0) {
+          profitDifferenceEl.className = 'badge profit';
+
+          const taxAmount = profit * 0.26;
+          const netProfit = profit - taxAmount;
+          const netTotal = investedCapital + netProfit;
+
+          taxAmountEl.textContent = '- € ' + taxAmount.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          netProfitEl.textContent = '+ € ' + netProfit.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          netTotalEl.textContent = '€ ' + netTotal.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+          taxBox.style.display = 'block';
+
+        } else if (profit < 0) {
+          profitDifferenceEl.className = 'badge loss';
+          taxBox.style.display = 'none';
+        } else {
+          profitDifferenceEl.className = 'result-value';
+          taxBox.style.display = 'none';
+        }
+      }
+
+      // Esegui calcolo DCA
+      calculateDCA(buyPrice, sharesCount, investedCapital);
+    }
+
+    function calculateDCA(initialBuyPrice, initialShares, initialCapital) {
+      const currentMarketPrice = parseFloat(currentMarketPriceInput.value);
+      const targetAveragePrice = parseFloat(targetAveragePriceInput.value);
+
+      if (!initialBuyPrice || !initialShares || !currentMarketPrice || !targetAveragePrice) {
+        dcaBox.style.display = 'none';
+        dcaError.style.display = 'none';
+        return;
+      }
+
+      // Validazione logica dei prezzi per mediata al ribasso
+      if (currentMarketPrice >= initialBuyPrice || targetAveragePrice <= currentMarketPrice || targetAveragePrice >= initialBuyPrice) {
+        dcaBox.style.display = 'none';
+        dcaError.style.display = 'block';
+        return;
+      }
+
+      dcaError.style.display = 'none';
+
+      // Formula matematica DCA per trovare le azioni aggiuntive necessarie:
+      // (P_iniziale * N_iniziale + P_mercato * N_nuove) / (N_iniziale + N_nuove) = P_target
+      // Formula derivata -> N_nuove = N_iniziale * (P_iniziale - P_target) / (P_target - P_mercato)
+      const newSharesNeeded = initialShares * (initialBuyPrice - targetAveragePrice) / (targetAveragePrice - currentMarketPrice);
+      const newCapitalNeeded = newSharesNeeded * currentMarketPrice;
+
+      const totalShares = initialShares + newSharesNeeded;
+      const totalCapital = initialCapital + newCapitalNeeded;
+
+      newSharesNeededEl.textContent = newSharesNeeded.toLocaleString('it-IT', { maximumFractionDigits: 4 });
+      newCapitalNeededEl.textContent = '€ ' + newCapitalNeeded.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      totalSharesAfterDcaEl.textContent = totalShares.toLocaleString('it-IT', { maximumFractionDigits: 4 });
+      totalCapitalAfterDcaEl.textContent = '€ ' + totalCapital.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      dcaBox.style.display = 'block';
+    }
+
+    function resetOutputs() {
+      valOutput1.textContent = '0';
+      valOutput2.textContent = '€ 0,00';
+      theoreticalCapitalEl.textContent = '€ 0,00';
+      profitDifferenceEl.textContent = '€ 0,00 (0,00%)';
+      profitDifferenceEl.className = 'result-value';
+      taxBox.style.display = 'none';
+    }
+
+    buyPriceInput.addEventListener('input', calculate);
+    investedCapitalInput.addEventListener('input', calculate);
+    sharesInput.addEventListener('input', calculate);
+    sellPriceInput.addEventListener('input', calculate);
+    currentMarketPriceInput.addEventListener('input', calculate);
+    targetAveragePriceInput.addEventListener('input', calculate);
+  </script>
+
+</body>
+</html>

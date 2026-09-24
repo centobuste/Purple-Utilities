@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisi Dinamica Trade & Capital Gain</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #1f2937;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 650px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 1.5rem;
+            color: #ffffff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #374151;
+            padding-bottom: 10px;
+        }
+        .card-section {
+            background-color: #111827;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        .row:last-child {
+            margin-bottom: 0;
+        }
+        .label {
+            color: #9ca3af;
+        }
+        .value {
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .highlight-green {
+            color: #10b981;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .highlight-red {
+            color: #ef4444;
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+        .badge {
+            background-color: #374151;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        input[type="number"] {
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            width: 110px;
+            text-align: right;
+            font-size: 1rem;
+        }
+        .presets {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .preset-btn {
+            background-color: #374151;
+            border: none;
+            color: #f3f4f6;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .preset-btn:hover {
+            background-color: #4b5563;
+        }
+        .preset-btn.active {
+            background-color: #10b981;
+            color: #ffffff;
+        }
+        .slider-wrap {
+            margin-top: 4px;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #10b981;
+            cursor: pointer;
+        }
+        .slider-minmax {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+        input[type="text"] {
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .fetch-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .fetch-row input[type="text"] {
+            flex: 1;
+        }
+        .fetch-btn {
+            background-color: #2563eb;
+            border: none;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .fetch-btn:hover {
+            background-color: #1d4ed8;
+        }
+        .fetch-btn:disabled {
+            background-color: #4b5563;
+            cursor: not-allowed;
+        }
+        .api-key-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .status-msg {
+            font-size: 0.8rem;
+            margin-top: 6px;
+            min-height: 1em;
+        }
+        .status-ok { color: #10b981; }
+        .status-err { color: #ef4444; }
+        .status-warn { color: #f59e0b; }
+        .small-note {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Dashboard Dinamica Trade & Capital Gain</h1>
+
+    <!-- Sezione Recupero Automatico Prezzi -->
+    <div class="card-section">
+        <div class="api-key-row" style="margin-bottom: 10px;">
+            <span class="label">Chiave API Twelve Data (gratuita su twelvedata.com):</span>
+            <input type="text" id="inputApiKey" placeholder="Incolla qui la tua API key">
+        </div>
+        <div class="fetch-row">
+            <input type="text" id="inputTicker" placeholder="Es: AAPL, ENI.MI, MC.PA" value="">
+            <button class="fetch-btn" id="btnFetch" onclick="recuperaPrezzi()">Recupera Prezzi</button>
+        </div>
+        <div id="statusFetch" class="status-msg"></div>
+        <div class="small-note">Dati con piano gratuito: aggiornati ogni pochi minuti, non tick-by-tick. Se il titolo è in USD (o altra valuta), i prezzi vengono convertiti automaticamente in Euro al cambio corrente. Se il bid/ask non è disponibile, verrà usato il prezzo corrente per entrambi i campi.</div>
+    </div>
+
+    <!-- Sezione Input Capitale -->
+    <div class="card-section">
+        <div class="row">
+            <span class="label">Capitale Investito (€):</span>
+            <input type="number" id="inputCapitale" value="5000" min="10" step="100">
+        </div>
+        <div class="presets">
+            <button class="preset-btn" onclick="impostaCapitale(1000)">1.000 €</button>
+            <button class="preset-btn" onclick="impostaCapitale(2000)">2.000 €</button>
+            <button class="preset-btn active" onclick="impostaCapitale(5000)">5.000 €</button>
+            <button class="preset-btn" onclick="impostaCapitale(10000)">10.000 €</button>
+        </div>
+    </div>
+
+    <!-- Sezione Input Parametri di Mercato e Commissioni -->
+    <div class="card-section">
+        <div class="row">
+            <span class="label">Prezzo Lettera (Ask) €:</span>
+            <input type="number" id="inputLettera" value="195.40" step="0.01">
+        </div>
+        <div class="row">
+            <span class="label">Prezzo Denaro (Bid) €:</span>
+            <input type="number" id="inputDenaro" value="195.30" step="0.01">
+        </div>
+        <div class="row">
+            <span class="label">Spese Commissione Totali (€):</span>
+            <input type="number" id="inputCommissioni" value="2.00" step="0.50">
+        </div>
+        <div class="row"><span class="label">Azioni Acquistate:</span> <span id="numAzioni" class="value">0</span></div>
+    </div>
+
+    <!-- Metriche Spread e Spese -->
+    <div class="card-section">
+        <div class="row"><span class="label">Spread Assoluto:</span> <span id="spreadAssoluto" class="value">0,00 €</span></div>
+        <div class="row"><span class="label">Spread Percentuale:</span> <span id="spreadPerc" class="value badge">0%</span></div>
+        <div class="row" style="margin-top: 10px;">
+            <span class="label">Valore Reale Immediato (al Denaro, netto commissioni):</span>
+            <span id="valoreImmediato" class="value">0,00 €</span>
+        </div>
+        <div class="row" style="align-items: center; margin-top: 10px;">
+            <span class="label">Spese di Commissione Evidenziate:</span> 
+            <span id="totaleCommissioniEvidenza" class="highlight-red">2,00 €</span>
+        </div>
+    </div>
+
+    <!-- Obiettivo di Guadagno e Capital Gain -->
+    <div class="card-section">
+        <div class="row"><span class="label">Guadagno Netto Target:</span> <span id="targetNettoValore" class="value" style="color: #10b981;">+50,00 €</span></div>
+        <div class="slider-wrap">
+            <input type="range" id="inputTargetNetto" min="5" max="200" step="1" value="50">
+            <div class="slider-minmax">
+                <span>5 €</span>
+                <span>200 €</span>
+            </div>
+        </div>
+        <div class="presets">
+            <button class="preset-btn" onclick="impostaTargetNetto(10)">10 €</button>
+            <button class="preset-btn" onclick="impostaTargetNetto(20)">20 €</button>
+            <button class="preset-btn active" onclick="impostaTargetNetto(50)">50 €</button>
+            <button class="preset-btn" onclick="impostaTargetNetto(100)">100 €</button>
+        </div>
+        <div class="row"><span class="label">Tassa Capital Gain (26%):</span> <span id="impostaTassa" class="value">0,00 €</span></div>
+        <div class="row" style="flex-direction: column; align-items: flex-start; gap: 5px; margin-top: 10px;">
+            <span class="label">Prezzo di Vendita Necessario (Target Netto):</span> 
+            <span id="prezzoTarget" class="highlight-green">0,00 €</span>
+        </div>
+        <div class="row" style="margin-top: 10px;"><span class="label">Rialzo % Richiesto sul Mercato:</span> <span id="rialzoPerc" class="value">0%</span></div>
+    </div>
+</div>
+
+<script>
+    function calcolaDati() {
+        const capitale = parseFloat(document.getElementById('inputCapitale').value) || 0;
+        const prezzoLettera = parseFloat(document.getElementById('inputLettera').value) || 0;
+        const prezzoDenaro = parseFloat(document.getElementById('inputDenaro').value) || 0;
+        const commissioniTotali = parseFloat(document.getElementById('inputCommissioni').value) || 0;
+        const targetNetto = parseFloat(document.getElementById('inputTargetNetto').value) || 0;
+        const aliquotaCapitalGain = 0.26; // 26%
+
+        // Aggiornamento label guadagno netto target
+        document.getElementById('targetNettoValore').innerText = '+' + targetNetto.toFixed(2) + ' €';
+
+        // Aggiornamento visivo spese in rosso grande
+        document.getElementById('totaleCommissioniEvidenza').innerText = commissioniTotali.toFixed(2) + ' €';
+
+        if (prezzoLettera <= 0 || capitale <= 0) {
+            document.getElementById('numAzioni').innerText = '0';
+            document.getElementById('spreadAssoluto').innerText = '0,00 €';
+            document.getElementById('spreadPerc').innerText = '0%';
+            document.getElementById('valoreImmediato').innerText = '0,00 €';
+            document.getElementById('impostaTassa').innerText = '0,00 €';
+            document.getElementById('prezzoTarget').innerText = '0,00 €';
+            document.getElementById('rialzoPerc').innerText = '0%';
+            return;
+        }
+
+        // 1. Azioni acquistate
+        const azioni = capitale / prezzoLettera;
+
+        // 2. Spread
+        const spreadAssoluto = prezzoLettera - prezzoDenaro;
+        const spreadPerc = (spreadAssoluto / prezzoLettera) * 100;
+
+        // 2bis. Valore reale immediato: se vendessi ora al Denaro, netto delle commissioni
+        const valoreImmediato = (azioni * prezzoDenaro) - commissioniTotali;
+
+        // 3. Calcolo Capital Gain e Prezzo Target
+        const profittoLordo = (targetNetto + commissioniTotali) / (1 - aliquotaCapitalGain);
+        const impostaTassa = profittoLordo * aliquotaCapitalGain;
+        
+        const ricavoLordoTotale = capitale + profittoLordo + commissioniTotali;
+        const prezzoVenditaTarget = ricavoLordoTotale / azioni;
+        const rialzoPerc = ((prezzoVenditaTarget - prezzoLettera) / prezzoLettera) * 100;
+
+        // Aggiornamento interfaccia
+        document.getElementById('numAzioni').innerText = azioni.toFixed(4);
+        document.getElementById('spreadAssoluto').innerText = spreadAssoluto.toFixed(2) + ' €';
+        document.getElementById('spreadPerc').innerText = spreadPerc.toFixed(3) + '%';
+        const valoreImmediatoEl = document.getElementById('valoreImmediato');
+        valoreImmediatoEl.innerText = valoreImmediato.toFixed(2) + ' €';
+        valoreImmediatoEl.style.color = valoreImmediato >= capitale ? '#10b981' : '#ef4444';
+        document.getElementById('impostaTassa').innerText = impostaTassa.toFixed(2) + ' €';
+        document.getElementById('prezzoTarget').innerText = prezzoVenditaTarget.toFixed(2) + ' €';
+        document.getElementById('rialzoPerc').innerText = '+' + rialzoPerc.toFixed(2) + '%';
+    }
+
+    async function recuperaPrezzi() {
+        const apiKey = document.getElementById('inputApiKey').value.trim();
+        const ticker = document.getElementById('inputTicker').value.trim().toUpperCase();
+        const statusEl = document.getElementById('statusFetch');
+        const btn = document.getElementById('btnFetch');
+
+        statusEl.className = 'status-msg';
+        statusEl.innerText = '';
+
+        if (!apiKey) {
+            statusEl.className = 'status-msg status-err';
+            statusEl.innerText = 'Inserisci la tua API key di Twelve Data.';
+            return;
+        }
+        if (!ticker) {
+            statusEl.className = 'status-msg status-err';
+            statusEl.innerText = 'Inserisci il simbolo del titolo (es. AAPL).';
+            return;
+        }
+
+        try {
+            localStorage.setItem('td_api_key', apiKey);
+        } catch (e) { /* ignora se storage non disponibile */ }
+
+        btn.disabled = true;
+        btn.innerText = 'Attendere...';
+        statusEl.innerText = 'Recupero dati in corso...';
+
+        try {
+            const url = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(apiKey)}`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+
+            if (data.status === 'error' || data.code) {
+                statusEl.className = 'status-msg status-err';
+                statusEl.innerText = 'Errore: ' + (data.message || 'simbolo non trovato o chiave non valida.');
+                return;
+            }
+
+            const bid = parseFloat(data.bid);
+            const ask = parseFloat(data.ask);
+            const prezzoCorrente = parseFloat(data.close ?? data.price);
+            const valuta = (data.currency || 'USD').toUpperCase();
+
+            // Se la valuta non è EUR, recupera il cambio verso EUR e converti
+            let tassoCambio = 1;
+            let cambioOk = true;
+            if (valuta !== 'EUR') {
+                try {
+                    const fxUrl = `https://api.twelvedata.com/exchange_rate?symbol=${valuta}/EUR&apikey=${encodeURIComponent(apiKey)}`;
+                    const fxResp = await fetch(fxUrl);
+                    const fxData = await fxResp.json();
+                    const rate = parseFloat(fxData.rate);
+                    if (!isNaN(rate) && rate > 0) {
+                        tassoCambio = rate;
+                    } else {
+                        cambioOk = false;
+                    }
+                } catch (e) {
+                    cambioOk = false;
+                }
+            }
+
+            let usatoFallback = false;
+
+            if (!isNaN(ask) && ask > 0) {
+                document.getElementById('inputLettera').value = (ask * tassoCambio).toFixed(4);
+            } else if (!isNaN(prezzoCorrente) && prezzoCorrente > 0) {
+                document.getElementById('inputLettera').value = (prezzoCorrente * tassoCambio).toFixed(4);
+                usatoFallback = true;
+            }
+
+            if (!isNaN(bid) && bid > 0) {
+                document.getElementById('inputDenaro').value = (bid * tassoCambio).toFixed(4);
+            } else if (!isNaN(prezzoCorrente) && prezzoCorrente > 0) {
+                document.getElementById('inputDenaro').value = (prezzoCorrente * tassoCambio).toFixed(4);
+                usatoFallback = true;
+            }
+
+            calcolaDati();
+
+            const notaValuta = valuta !== 'EUR'
+                ? (cambioOk ? ` (convertito da ${valuta}, cambio ${tassoCambio.toFixed(4)})` : ` (ATTENZIONE: cambio ${valuta}→EUR non disponibile, valori mostrati ancora in ${valuta})`)
+                : '';
+
+            if (usatoFallback) {
+                statusEl.className = 'status-msg status-warn';
+                statusEl.innerText = `Bid/Ask non disponibili per ${ticker}: usato il prezzo corrente${notaValuta}.`;
+            } else {
+                statusEl.className = cambioOk ? 'status-msg status-ok' : 'status-msg status-err';
+                statusEl.innerText = `Prezzi aggiornati per ${ticker}${notaValuta}.`;
+            }
+        } catch (err) {
+            statusEl.className = 'status-msg status-err';
+            statusEl.innerText = 'Errore di rete durante il recupero dei dati.';
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Recupera Prezzi';
+        }
+    }
+
+    // Ripristina la chiave API salvata, se presente
+    try {
+        const savedKey = localStorage.getItem('td_api_key');
+        if (savedKey) {
+            document.getElementById('inputApiKey').value = savedKey;
+        }
+    } catch (e) { /* ignora se storage non disponibile */ }
+
+    function impostaTargetNetto(valore) {
+        document.getElementById('inputTargetNetto').value = valore;
+        aggiornaPresetTargetNetto(valore);
+        calcolaDati();
+    }
+
+    function aggiornaPresetTargetNetto(valore) {
+        const presetValues = [10, 20, 50, 100];
+        const buttons = document.querySelectorAll('#inputTargetNetto').length
+            ? document.getElementById('inputTargetNetto').closest('.card-section').querySelectorAll('.preset-btn')
+            : [];
+        buttons.forEach((btn, i) => {
+            if (presetValues[i] === Number(valore)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    document.getElementById('inputTargetNetto').addEventListener('input', () => {
+        aggiornaPresetTargetNetto(document.getElementById('inputTargetNetto').value);
+    });
+
+    function impostaCapitale(valore) {
+        document.getElementById('inputCapitale').value = valore;
+        const buttons = document.querySelectorAll('.presets button');
+        buttons.forEach(btn => {
+            if (btn.innerText.includes(valore.toLocaleString('it-IT'))) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        calcolaDati();
+    }
+
+    // Associazione degli eventi di input
+    ['inputCapitale', 'inputLettera', 'inputDenaro', 'inputCommissioni', 'inputTargetNetto'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', calcolaDati);
+            el.addEventListener('keyup', calcolaDati);
+            el.addEventListener('change', calcolaDati);
+        }
+    });
+
+    // Avvio immediato al caricamento
+    window.addEventListener('DOMContentLoaded', calcolaDati);
+    calcolaDati();
+</script>
+
+</body>
+</html>
